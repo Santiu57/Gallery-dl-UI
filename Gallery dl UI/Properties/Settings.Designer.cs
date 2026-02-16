@@ -46,5 +46,53 @@ namespace Gallery_dl_UI.Properties {
                 this["DirectoryPath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int SimultaneousDownloads {
+            get {
+                return ((int)(this["SimultaneousDownloads"]));
+            }
+            set {
+                this["SimultaneousDownloads"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string FileName {
+            get {
+                return ((string)(this["FileName"]));
+            }
+            set {
+                this["FileName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("White")]
+        public global::System.Drawing.Color MainBackColor {
+            get {
+                return ((global::System.Drawing.Color)(this["MainBackColor"]));
+            }
+            set {
+                this["MainBackColor"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Black")]
+        public global::System.Drawing.Color MainForeColor {
+            get {
+                return ((global::System.Drawing.Color)(this["MainForeColor"]));
+            }
+            set {
+                this["MainForeColor"] = value;
+            }
+        }
     }
 }
