@@ -30,10 +30,11 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            toolStrip1 = new ToolStrip();
+            tsBar = new ToolStrip();
             tsStatusLabel = new ToolStripLabel();
             tsProgresBar = new ToolStripProgressBar();
             tsbtnConfig = new ToolStripButton();
+            tsbtnArgs = new ToolStripButton();
             tsbtnLog = new ToolStripButton();
             btnStartdownload = new Button();
             txbAddUrl = new TextBox();
@@ -43,19 +44,19 @@
             Url = new DataGridViewTextBoxColumn();
             btnClear = new Button();
             tpTexts = new ToolTip(components);
-            toolStrip1.SuspendLayout();
+            tsBar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvUrls).BeginInit();
             SuspendLayout();
             // 
-            // toolStrip1
+            // tsBar
             // 
-            toolStrip1.ImageScalingSize = new Size(20, 20);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { tsStatusLabel, tsProgresBar, tsbtnConfig, tsbtnLog });
-            toolStrip1.Location = new Point(0, 0);
-            toolStrip1.Name = "toolStrip1";
-            toolStrip1.Size = new Size(521, 27);
-            toolStrip1.TabIndex = 0;
-            toolStrip1.Text = "toolStrip1";
+            tsBar.ImageScalingSize = new Size(20, 20);
+            tsBar.Items.AddRange(new ToolStripItem[] { tsStatusLabel, tsProgresBar, tsbtnConfig, tsbtnArgs, tsbtnLog });
+            tsBar.Location = new Point(0, 0);
+            tsBar.Name = "tsBar";
+            tsBar.Size = new Size(380, 27);
+            tsBar.TabIndex = 0;
+            tsBar.Text = "toolStrip1";
             // 
             // tsStatusLabel
             // 
@@ -80,6 +81,18 @@
             tsbtnConfig.ToolTipText = "Configuration";
             tsbtnConfig.Click += tsbtnConfig_Click;
             // 
+            // tsbtnArgs
+            // 
+            tsbtnArgs.Alignment = ToolStripItemAlignment.Right;
+            tsbtnArgs.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbtnArgs.Image = (Image)resources.GetObject("tsbtnArgs.Image");
+            tsbtnArgs.ImageTransparentColor = Color.Magenta;
+            tsbtnArgs.Name = "tsbtnArgs";
+            tsbtnArgs.Size = new Size(29, 24);
+            tsbtnArgs.Text = "toolStripButton1";
+            tsbtnArgs.ToolTipText = "Gallery Dl Args";
+            tsbtnArgs.Click += tsbtnArgs_Click;
+            // 
             // tsbtnLog
             // 
             tsbtnLog.Alignment = ToolStripItemAlignment.Right;
@@ -93,10 +106,10 @@
             // 
             // btnStartdownload
             // 
-            btnStartdownload.Font = new Font("Daily Vibes", 13.8F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            btnStartdownload.Location = new Point(380, 187);
+            btnStartdownload.Font = new Font("Daily Vibes", 8.999999F);
+            btnStartdownload.Location = new Point(292, 221);
             btnStartdownload.Name = "btnStartdownload";
-            btnStartdownload.Size = new Size(135, 42);
+            btnStartdownload.Size = new Size(82, 27);
             btnStartdownload.TabIndex = 1;
             btnStartdownload.Text = "Start";
             tpTexts.SetToolTip(btnStartdownload, "Start downloads");
@@ -105,11 +118,11 @@
             // 
             // txbAddUrl
             // 
-            txbAddUrl.Location = new Point(0, 202);
+            txbAddUrl.Location = new Point(0, 222);
             txbAddUrl.Multiline = true;
             txbAddUrl.Name = "txbAddUrl";
-            txbAddUrl.PlaceholderText = "Paste Url to Add it";
-            txbAddUrl.Size = new Size(341, 27);
+            txbAddUrl.PlaceholderText = "Paste Urls to Add them";
+            txbAddUrl.Size = new Size(253, 27);
             txbAddUrl.TabIndex = 2;
             txbAddUrl.TextChanged += txbAddUrl_TextChanged;
             // 
@@ -130,12 +143,12 @@
             dgvUrls.AllowUserToAddRows = false;
             dgvUrls.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvUrls.Columns.AddRange(new DataGridViewColumn[] { Site, Url });
-            dgvUrls.Location = new Point(0, 27);
+            dgvUrls.Location = new Point(0, 32);
             dgvUrls.Name = "dgvUrls";
             dgvUrls.RowHeadersVisible = false;
             dgvUrls.RowHeadersWidth = 51;
             dgvUrls.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvUrls.Size = new Size(374, 169);
+            dgvUrls.Size = new Size(374, 184);
             dgvUrls.TabIndex = 3;
             // 
             // Site
@@ -155,7 +168,7 @@
             // btnClear
             // 
             btnClear.BackgroundImageLayout = ImageLayout.Stretch;
-            btnClear.Location = new Point(347, 202);
+            btnClear.Location = new Point(259, 221);
             btnClear.Name = "btnClear";
             btnClear.Size = new Size(27, 27);
             btnClear.TabIndex = 4;
@@ -167,19 +180,19 @@
             // 
             AutoScaleDimensions = new SizeF(9F, 18F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(521, 233);
+            ClientSize = new Size(380, 253);
             Controls.Add(btnClear);
             Controls.Add(dgvUrls);
             Controls.Add(txbAddUrl);
             Controls.Add(btnStartdownload);
-            Controls.Add(toolStrip1);
+            Controls.Add(tsBar);
             Font = new Font("Daily Vibes", 8.999999F, FontStyle.Regular, GraphicsUnit.Point, 0);
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
             Name = "MainForm";
             Text = "Gallery dl UI";
             Load += Form1_Load;
-            toolStrip1.ResumeLayout(false);
-            toolStrip1.PerformLayout();
+            tsBar.ResumeLayout(false);
+            tsBar.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)dgvUrls).EndInit();
             ResumeLayout(false);
             PerformLayout();
@@ -187,7 +200,7 @@
 
         #endregion
 
-        private ToolStrip toolStrip1;
+        private ToolStrip tsBar;
         private Button btnStartdownload;
         private TextBox txbAddUrl;
         private WK.Libraries.SharpClipboardNS.SharpClipboard Sclip;
@@ -200,5 +213,6 @@
         private DataGridViewTextBoxColumn Url;
         private ToolStripButton tsbtnLog;
         private ToolTip tpTexts;
+        private ToolStripButton tsbtnArgs;
     }
 }

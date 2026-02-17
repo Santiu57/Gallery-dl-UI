@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Policy;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using WK.Libraries.SharpClipboardNS;
 
@@ -16,9 +17,12 @@ namespace Gallery_dl_UI
             ColorComponents();
             LoadImages();
             WindowConfig();
+            FontChange(this);
+            ForceRefresh(this);
+            LoadArguments();
         }
 
-        private void TraverseAllControls(Control parent, Action<Control> action)
+        public static void TraverseAllControls(Control parent, Action<Control> action)
         {
             action(parent);
 
@@ -51,8 +55,13 @@ namespace Gallery_dl_UI
         private void tsbtnConfig_Click(object sender, EventArgs e)
         {
             Config config = new Config();
+            _currentScale = 1f;
             config.ShowDialog();
             ColorComponents();
+            if (btnStartdownload.Font != Properties.Settings.Default.MainFont)
+            {
+                Application.Restart();
+            }
         }
         private void btnClear_Click(object sender, EventArgs e)
         {
@@ -177,17 +186,20 @@ namespace Gallery_dl_UI
                 control.Enabled = true;
             });
 
-            Urls.Clear();
-            NotificationShow("Completado", "Operación realizada con exito", 600);
+            dgvUrls.Rows.Clear();
+            if (!Errors())
+            {
+                Urls.Clear();
+                NotificationShow("Completado", "Operación realizada con exito", 600);
+            }
             ChangeStatusLabel("sleeping...");
             ChangeProgresBar(0);
-            dgvUrls.Rows.Clear();
         }
 
 
 
         //Args
-        static List<Argument> Args = new List<Argument>();
+        public static List<Argument> Args = new();
         string Arguments = "";
 
         void BuilArgs()
@@ -200,28 +212,34 @@ namespace Gallery_dl_UI
             }
         }
 
-        Argument DestinationPATH = new Argument("Destination Path", Properties.Settings.Default.DestinationPath, "-d", "Target location for file downloads", Args);
-        Argument DirectoryPATH = new Argument("Download Path", Properties.Settings.Default.DirectoryPath, "-D", "Exact location for file downloads", Args, false);
-        Argument FileName = new Argument("File Name", Properties.Settings.Default.FileName, "-f", "Files naming structure", Args, false);
-        Argument NoOverwrites = new Argument("No overwrites", "", "--no-overwrites", "Skip files that already exist", Args);
-        Argument NoProgress = new Argument("NoProgress", "", "--no-progress", "Removes console progress", Args);
+        Argument DestinationPATH = new Argument("Destination Path", Properties.Settings.Default.DestinationPath, "-d", "Target location for file downloads", Args, true);
+        Argument DirectoryPATH = new Argument("Download Path", Properties.Settings.Default.DirectoryPath, "-D", "Exact location for file downloads", Args, true, false);
+        Argument FileName = new Argument("File Name", Properties.Settings.Default.FileName, "-f", "Files naming structure", Args, true ,false);
+        Argument NoOverwrites = new Argument("No overwrites", " ", "--no-overwrites", "Skip files that already exist", Args, false);
+        Argument NoProgress = new Argument("No Progress", " ", "--no-progress", "Removes console progress", Args, false);
+        Argument ErrorLog = new Argument("Error Log", Properties.Settings.Default.ErrorLog, "-e", "Path to save error logs", Args, false);
+        Argument Retries = new Argument("Retries", Properties.Settings.Default.Retries, "-R", "Maximum number of retries for failed HTTP requests. -1 for infinite retries", Args, true);
+        Argument Sleep = new Argument("Sleep", Properties.Settings.Default.Sleep, "--sleep", " Number of seconds to wait before each download. This can be either a constant value or a range (e.g. 2.7 or 2.0-3.5)", Args, true, false);
+        Argument Range = new Argument("Range", Properties.Settings.Default.Range, "--range", "Index range(s) specifying which files to download. These can be either a constant value, range, or slice (e.g. '5', '8-20', or '1:24:3')", Args, true, false);
 
-        class Argument
+        public class Argument
         {
             public string Name { get; }
             public string Value { get; set; }
             public string Command { get; }
             public string Description { get; }
             public bool Enabled { get; set; }
+            public bool Visible { get; }
             List<Argument> Container;
 
-            public Argument(string name, string value, string command, string description, List<Argument> container, bool enabled = true)
+            public Argument(string name, string value, string command, string description, List<Argument> container,bool visible, bool enabled = true)
             {
                 Name = name;
                 Value = value;
                 Command = command;
                 Description = description;
                 Enabled = enabled;
+                Visible = visible;
                 this.Container = container;
                 Container.Add(this);
             }
@@ -234,7 +252,47 @@ namespace Gallery_dl_UI
                 return Command + " " + Value + " ";
             }
         }
+        public class ArgumentState
+        {
+            public string Name { get; set; }
+            public string Value { get; set; }
+            public bool Enabled { get; set; }
+        }
+        public static void SaveArguments()
+        {
+            var state = MainForm.Args.Select(a => new ArgumentState
+            {
+                Name = a.Name,
+                Value = a.Value,
+                Enabled = a.Enabled
+            }).ToList();
 
+            Properties.Settings.Default.ArgumentsState = JsonSerializer.Serialize(state);
+
+            Properties.Settings.Default.Save();
+        }
+
+        public void LoadArguments()
+        {
+            string json = Properties.Settings.Default.ArgumentsState;
+
+            if (string.IsNullOrWhiteSpace(json))
+                return;
+
+            var state = JsonSerializer.Deserialize<List<ArgumentState>>(json);
+
+            foreach (var saved in state)
+            {
+                var arg = MainForm.Args
+                    .FirstOrDefault(a => a.Name == saved.Name);
+
+                if (arg != null)
+                {
+                    arg.Value = saved.Value;
+                    arg.Enabled = saved.Enabled;
+                }
+            }
+        }
 
         //Config
 
@@ -259,7 +317,7 @@ namespace Gallery_dl_UI
 
         private void NotificationShow(string Title, string Text, int time)
         {
-            trayIcon.Icon = ConvertImageToIcon(Image.FromFile("images/icon.png"));
+            trayIcon.Icon = new System.Drawing.Icon("images/icon.ico");
             trayIcon.Visible = true;
             trayIcon.BalloonTipTitle = Title;
             trayIcon.BalloonTipText = Text;
@@ -309,7 +367,7 @@ namespace Gallery_dl_UI
             btnClear.BackgroundImage = Image.FromFile("images/clear.png");
             btnClear.ImageAlign = ContentAlignment.MiddleCenter;
             btnClear.BackgroundImageLayout = ImageLayout.Stretch;
-            this.Icon = ConvertImageToIcon(Image.FromFile("images/icon.png"));
+            this.Icon = ConvertImageToIcon("images/icon.png");
         }
 
         private void WindowConfig()
@@ -321,11 +379,78 @@ namespace Gallery_dl_UI
             this.ShowIcon = true;
         }
 
-        //Icon
-
-        private Icon ConvertImageToIcon(Image img, int size = 256)
+        private void PaintErrors()
         {
-            using (Bitmap original = new Bitmap(img))
+            foreach (DataGridViewRow row in dgvUrls.Rows)
+            {
+                if (row.Cells[1].Value != null)
+                {
+                    string url = row.Cells[1].Value.ToString();
+                    if (!string.IsNullOrWhiteSpace(url) && Urls.Contains(url))
+                    {
+                        row.DefaultCellStyle.ForeColor = Color.Red;
+                    }
+                }
+            }
+        }
+
+        public static float _currentScale = 1f;
+
+        public static void FontChange(Control form)
+        {
+            TraverseAllControls(form, control =>
+            {
+                control.Font = null;
+            });
+
+            var newFont = Properties.Settings.Default.MainFont;
+
+            float newScale = newFont.Size / form.Font.Size;
+            float deltaScale = newScale / MainForm._currentScale;
+
+            form.SuspendLayout();
+
+            form.Font = newFont;
+            form.Scale(new SizeF(deltaScale, deltaScale));
+
+            _currentScale = newScale;
+
+        }
+        private void ForceRefresh(Control parent)
+        {
+            foreach (Control control in parent.Controls)
+            {
+                if (control is ToolStrip ts)
+                {
+                    ts.SuspendLayout();
+                    ts.Font = this.Font;
+
+                    foreach (ToolStripItem item in ts.Items)
+                    {
+                        item.Font = this.Font;
+                        item.AutoSize = true;
+                    }
+
+                    ts.PerformLayout();
+                    ts.ResumeLayout();
+                }
+                if (control is Button btn)
+                {
+                    if (btn.Name == "btnStartdownload")
+                    {
+
+                    }
+                }
+
+                if (control.HasChildren)
+                    ForceRefresh(control);
+            }
+        }
+
+        //Icon
+        public static Icon ConvertImageToIcon(string imagePath, int size = 256)
+        {
+            using (Bitmap original = new Bitmap(imagePath))
             using (Bitmap resized = new Bitmap(original, new Size(size, size)))
             {
                 IntPtr hIcon = resized.GetHicon();
@@ -343,7 +468,6 @@ namespace Gallery_dl_UI
                 }
             }
         }
-
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern bool DestroyIcon(IntPtr handle);
 
@@ -426,11 +550,50 @@ namespace Gallery_dl_UI
         //TXB
         private void txbAddUrl_TextChanged(object sender, EventArgs e)
         {
-            if (ValidUrl(txbAddUrl.Text))
+            foreach (string url in UrlExtractor(txbAddUrl.Text))
             {
-                AddUrlToDGV(txbAddUrl.Text);
-                txbAddUrl.Clear();
+                if (!RepetedUrl(url))
+                {
+                    AddUrlToDGV(url);
+                }
             }
+            txbAddUrl.Clear();
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        //Errors Manager
+        private bool Errors()
+        {
+            string errorLogPath = Properties.Settings.Default.ErrorLog;
+            if (string.IsNullOrWhiteSpace(errorLogPath) || !File.Exists(errorLogPath))
+                return false;
+            try
+            {
+                string[] errorLines = File.ReadAllLines(errorLogPath);
+                NotificationShow("Error Detectado", errorLines.Length.ToString() + " Urls", 5000);
+                foreach (string UrlError in errorLines)
+                {
+                    AddUrlToDGV(UrlError);
+                }
+                File.Delete(errorLogPath);
+                PaintErrors();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al leer el archivo: " + ex.Message);
+                return true;
+            }
+        }
+
+        private void tsbtnArgs_Click(object sender, EventArgs e)
+        {
+            ArgsForm argsForm = new ArgsForm();
+            argsForm.ShowDialog();
         }
     }
 }

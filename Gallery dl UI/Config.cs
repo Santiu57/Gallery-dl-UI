@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Security.Policy;
 using System.Text;
 using System.Windows.Forms;
+using static Gallery_dl_UI.MainForm;
 
 namespace Gallery_dl_UI
 {
@@ -14,9 +17,10 @@ namespace Gallery_dl_UI
         public Config()
         {
             InitializeComponent();
-            this.Icon = ConvertImageToIcon("images/icon.png");
+            this.Icon = MainForm.ConvertImageToIcon("images/icon.png");
             WindowConfig();
-            TraverseAllControls(this, control =>
+            FontChange();
+            MainForm.TraverseAllControls(this, control =>
             {
                 if (control is not Panel)
                 {
@@ -25,37 +29,7 @@ namespace Gallery_dl_UI
                 }
             });
         }
-        private void TraverseAllControls(Control parent, Action<Control> action)
-        {
-            action(parent);
 
-            foreach (Control control in parent.Controls)
-            {
-                TraverseAllControls(control, action);
-            }
-        }
-        private Icon ConvertImageToIcon(string imagePath, int size = 256)
-        {
-            using (Bitmap original = new Bitmap(imagePath))
-            using (Bitmap resized = new Bitmap(original, new Size(size, size)))
-            {
-                IntPtr hIcon = resized.GetHicon();
-
-                try
-                {
-                    using (Icon temp = Icon.FromHandle(hIcon))
-                    {
-                        return (Icon)temp.Clone();
-                    }
-                }
-                finally
-                {
-                    DestroyIcon(hIcon);
-                }
-            }
-        }
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        private static extern bool DestroyIcon(IntPtr handle);
         private void label1_Click(object sender, EventArgs e)
         {
 
@@ -71,6 +45,7 @@ namespace Gallery_dl_UI
             nudSimultaneousDownloads.Value = Properties.Settings.Default.SimultaneousDownloads;
             pnlBackColor.BackColor = Properties.Settings.Default.MainBackColor;
             pnlForeColor.BackColor = Properties.Settings.Default.MainForeColor;
+            fdLetteres.Font = Properties.Settings.Default.MainFont;
         }
         private void Config_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -134,6 +109,48 @@ namespace Gallery_dl_UI
                 pnlForeColor.BackColor = cdColor.Color;
                 pnlForeColor.BackColor = EnsureDifferent(pnlBackColor.BackColor, pnlForeColor.BackColor);
                 Properties.Settings.Default.MainForeColor = pnlForeColor.BackColor;
+            }
+        }
+        private void btnFontChange_Click(object sender, EventArgs e)
+        {
+            if (fdLetteres.ShowDialog().Equals(DialogResult.OK))
+            {
+                Properties.Settings.Default.MainFont = fdLetteres.Font;
+                lblFontPreview.Font = fdLetteres.Font;
+            }
+        }
+        private float _currentScale = 1f;
+
+        private void FontChange()
+        {
+            var newFont = Properties.Settings.Default.MainFont;
+
+            float newScale = newFont.Size / this.Font.Size;
+            float deltaScale = newScale / _currentScale;
+
+            this.SuspendLayout();
+
+            this.Font = newFont;
+            this.Scale(new SizeF(deltaScale, deltaScale));
+
+            _currentScale = newScale;
+
+        }
+
+        private void btnUpdateGalleryDl_Click(object sender, EventArgs e)
+        {
+            var startInfo = new ProcessStartInfo()
+            {
+                FileName = "gallery-dl",
+                Arguments = "-U",
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using (var process = new Process())
+            {
+                process.StartInfo = startInfo;
+                process.Start();
             }
         }
     }

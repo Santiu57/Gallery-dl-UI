@@ -94,5 +94,76 @@ namespace Gallery_dl_UI.Properties {
                 this["MainForeColor"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ErrorLog.txt")]
+        public string ErrorLog {
+            get {
+                return ((string)(this["ErrorLog"]));
+            }
+            set {
+                this["ErrorLog"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Drawing.Font MainFont {
+            get {
+                return ((global::System.Drawing.Font)(this["MainFont"]));
+            }
+            set {
+                this["MainFont"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ArgumentsState {
+            get {
+                return ((string)(this["ArgumentsState"]));
+            }
+            set {
+                this["ArgumentsState"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4")]
+        public string Retries {
+            get {
+                return ((string)(this["Retries"]));
+            }
+            set {
+                this["Retries"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public string Sleep {
+            get {
+                return ((string)(this["Sleep"]));
+            }
+            set {
+                this["Sleep"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Range {
+            get {
+                return ((string)(this["Range"]));
+            }
+            set {
+                this["Range"] = value;
+            }
+        }
     }
 }

@@ -38,6 +38,11 @@
             pnlBackColor = new Panel();
             pnlForeColor = new Panel();
             btnChangeForeColor = new Button();
+            btnUpdateGalleryDl = new Button();
+            fdLetteres = new FontDialog();
+            btnFontChange = new Button();
+            label4 = new Label();
+            lblFontPreview = new Label();
             ((System.ComponentModel.ISupportInitialize)nudSimultaneousDownloads).BeginInit();
             SuspendLayout();
             // 
@@ -76,7 +81,7 @@
             label2.Name = "label2";
             label2.Size = new Size(292, 36);
             label2.TabIndex = 3;
-            label2.Text = "Back Color";
+            label2.Text = "Main Back Color";
             // 
             // label3
             // 
@@ -85,7 +90,7 @@
             label3.Name = "label3";
             label3.Size = new Size(292, 39);
             label3.TabIndex = 4;
-            label3.Text = "Fore Color";
+            label3.Text = "Main Fore Color";
             // 
             // btnChangeBackColor
             // 
@@ -121,11 +126,52 @@
             btnChangeForeColor.UseVisualStyleBackColor = true;
             btnChangeForeColor.Click += btnChangeForeColor_Click;
             // 
+            // btnUpdateGalleryDl
+            // 
+            btnUpdateGalleryDl.Location = new Point(14, 196);
+            btnUpdateGalleryDl.Name = "btnUpdateGalleryDl";
+            btnUpdateGalleryDl.Size = new Size(213, 40);
+            btnUpdateGalleryDl.TabIndex = 9;
+            btnUpdateGalleryDl.Text = "Update Gallery Dl";
+            btnUpdateGalleryDl.UseVisualStyleBackColor = true;
+            btnUpdateGalleryDl.Click += btnUpdateGalleryDl_Click;
+            // 
+            // btnFontChange
+            // 
+            btnFontChange.Location = new Point(314, 130);
+            btnFontChange.Name = "btnFontChange";
+            btnFontChange.Size = new Size(102, 35);
+            btnFontChange.TabIndex = 11;
+            btnFontChange.Text = "Change";
+            btnFontChange.UseVisualStyleBackColor = true;
+            btnFontChange.Click += btnFontChange_Click;
+            // 
+            // label4
+            // 
+            label4.Location = new Point(14, 126);
+            label4.Margin = new Padding(5, 0, 5, 0);
+            label4.Name = "label4";
+            label4.Size = new Size(292, 39);
+            label4.TabIndex = 10;
+            label4.Text = "Main Font";
+            // 
+            // lblFontPreview
+            // 
+            lblFontPreview.Location = new Point(242, 133);
+            lblFontPreview.Name = "lblFontPreview";
+            lblFontPreview.Size = new Size(66, 32);
+            lblFontPreview.TabIndex = 12;
+            lblFontPreview.Text = "ABC";
+            // 
             // Config
             // 
             AutoScaleDimensions = new SizeF(14F, 28F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(433, 248);
+            Controls.Add(lblFontPreview);
+            Controls.Add(btnFontChange);
+            Controls.Add(label4);
+            Controls.Add(btnUpdateGalleryDl);
             Controls.Add(pnlForeColor);
             Controls.Add(btnChangeForeColor);
             Controls.Add(pnlBackColor);
@@ -159,5 +205,10 @@
         private Panel pnlBackColor;
         private Panel pnlForeColor;
         private Button btnChangeForeColor;
+        private Button btnUpdateGalleryDl;
+        private FontDialog fdLetteres;
+        private Button btnFontChange;
+        private Label label4;
+        private Label lblFontPreview;
     }
 }
