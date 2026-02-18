@@ -43,6 +43,7 @@
             btnFontChange = new Button();
             label4 = new Label();
             lblFontPreview = new Label();
+            btninstallGDl = new Button();
             ((System.ComponentModel.ISupportInitialize)nudSimultaneousDownloads).BeginInit();
             SuspendLayout();
             // 
@@ -58,7 +59,7 @@
             // 
             // nudSimultaneousDownloads
             // 
-            nudSimultaneousDownloads.Location = new Point(314, 7);
+            nudSimultaneousDownloads.Location = new Point(326, 7);
             nudSimultaneousDownloads.Maximum = new decimal(new int[] { 5, 0, 0, 0 });
             nudSimultaneousDownloads.Name = "nudSimultaneousDownloads";
             nudSimultaneousDownloads.Size = new Size(59, 35);
@@ -66,7 +67,7 @@
             // 
             // btnSave
             // 
-            btnSave.Location = new Point(331, 196);
+            btnSave.Location = new Point(343, 196);
             btnSave.Name = "btnSave";
             btnSave.Size = new Size(85, 40);
             btnSave.TabIndex = 2;
@@ -94,7 +95,7 @@
             // 
             // btnChangeBackColor
             // 
-            btnChangeBackColor.Location = new Point(314, 48);
+            btnChangeBackColor.Location = new Point(326, 48);
             btnChangeBackColor.Name = "btnChangeBackColor";
             btnChangeBackColor.Size = new Size(102, 35);
             btnChangeBackColor.TabIndex = 5;
@@ -104,21 +105,21 @@
             // 
             // pnlBackColor
             // 
-            pnlBackColor.Location = new Point(258, 47);
+            pnlBackColor.Location = new Point(270, 47);
             pnlBackColor.Name = "pnlBackColor";
             pnlBackColor.Size = new Size(50, 36);
             pnlBackColor.TabIndex = 6;
             // 
             // pnlForeColor
             // 
-            pnlForeColor.Location = new Point(258, 89);
+            pnlForeColor.Location = new Point(270, 89);
             pnlForeColor.Name = "pnlForeColor";
             pnlForeColor.Size = new Size(50, 35);
             pnlForeColor.TabIndex = 8;
             // 
             // btnChangeForeColor
             // 
-            btnChangeForeColor.Location = new Point(314, 89);
+            btnChangeForeColor.Location = new Point(326, 89);
             btnChangeForeColor.Name = "btnChangeForeColor";
             btnChangeForeColor.Size = new Size(102, 35);
             btnChangeForeColor.TabIndex = 7;
@@ -128,17 +129,17 @@
             // 
             // btnUpdateGalleryDl
             // 
-            btnUpdateGalleryDl.Location = new Point(14, 196);
+            btnUpdateGalleryDl.Location = new Point(180, 196);
             btnUpdateGalleryDl.Name = "btnUpdateGalleryDl";
-            btnUpdateGalleryDl.Size = new Size(213, 40);
+            btnUpdateGalleryDl.Size = new Size(157, 40);
             btnUpdateGalleryDl.TabIndex = 9;
-            btnUpdateGalleryDl.Text = "Update Gallery Dl";
+            btnUpdateGalleryDl.Text = "Update G-Dl";
             btnUpdateGalleryDl.UseVisualStyleBackColor = true;
             btnUpdateGalleryDl.Click += btnUpdateGalleryDl_Click;
             // 
             // btnFontChange
             // 
-            btnFontChange.Location = new Point(314, 130);
+            btnFontChange.Location = new Point(326, 130);
             btnFontChange.Name = "btnFontChange";
             btnFontChange.Size = new Size(102, 35);
             btnFontChange.TabIndex = 11;
@@ -157,17 +158,29 @@
             // 
             // lblFontPreview
             // 
-            lblFontPreview.Location = new Point(242, 133);
+            lblFontPreview.Location = new Point(221, 133);
             lblFontPreview.Name = "lblFontPreview";
-            lblFontPreview.Size = new Size(66, 32);
+            lblFontPreview.Size = new Size(99, 32);
             lblFontPreview.TabIndex = 12;
             lblFontPreview.Text = "ABC";
+            lblFontPreview.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // btninstallGDl
+            // 
+            btninstallGDl.Location = new Point(14, 196);
+            btninstallGDl.Name = "btninstallGDl";
+            btninstallGDl.Size = new Size(160, 40);
+            btninstallGDl.TabIndex = 13;
+            btninstallGDl.Text = "Install G-Dl";
+            btninstallGDl.UseVisualStyleBackColor = true;
+            btninstallGDl.Click += btninstallGDl_Click;
             // 
             // Config
             // 
             AutoScaleDimensions = new SizeF(14F, 28F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(433, 248);
+            Controls.Add(btninstallGDl);
             Controls.Add(lblFontPreview);
             Controls.Add(btnFontChange);
             Controls.Add(label4);
@@ -210,5 +223,6 @@
         private Button btnFontChange;
         private Label label4;
         private Label lblFontPreview;
+        private Button btninstallGDl;
     }
 }

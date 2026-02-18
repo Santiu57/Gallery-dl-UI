@@ -20,6 +20,7 @@ namespace Gallery_dl_UI
             FontChange(this);
             ForceRefresh(this);
             LoadArguments();
+            CheckGalleryDlUpdate();
         }
 
         public static void TraverseAllControls(Control parent, Action<Control> action)
@@ -212,15 +213,18 @@ namespace Gallery_dl_UI
             }
         }
 
-        Argument DestinationPATH = new Argument("Destination Path", Properties.Settings.Default.DestinationPath, "-d", "Target location for file downloads", Args, true);
-        Argument DirectoryPATH = new Argument("Download Path", Properties.Settings.Default.DirectoryPath, "-D", "Exact location for file downloads", Args, true, false);
-        Argument FileName = new Argument("File Name", Properties.Settings.Default.FileName, "-f", "Files naming structure", Args, true ,false);
+        Argument DestinationPATH = new Argument("Destination Path", Properties.Settings.Default.DestinationPath, "-d", "Target location for file downloads. Files will be distribute in the selected folder", Args, true);
+        Argument DirectoryPATH = new Argument("Download Path", Properties.Settings.Default.DirectoryPath, "-D", "Exact location for file downloads. All files will go to selected folder", Args, true, false);
+        Argument FileName = new Argument("File Name", Properties.Settings.Default.FileName, "-f", "Files naming structure", Args, true, false);
         Argument NoOverwrites = new Argument("No overwrites", " ", "--no-overwrites", "Skip files that already exist", Args, false);
         Argument NoProgress = new Argument("No Progress", " ", "--no-progress", "Removes console progress", Args, false);
         Argument ErrorLog = new Argument("Error Log", Properties.Settings.Default.ErrorLog, "-e", "Path to save error logs", Args, false);
         Argument Retries = new Argument("Retries", Properties.Settings.Default.Retries, "-R", "Maximum number of retries for failed HTTP requests. -1 for infinite retries", Args, true);
         Argument Sleep = new Argument("Sleep", Properties.Settings.Default.Sleep, "--sleep", " Number of seconds to wait before each download. This can be either a constant value or a range (e.g. 2.7 or 2.0-3.5)", Args, true, false);
         Argument Range = new Argument("Range", Properties.Settings.Default.Range, "--range", "Index range(s) specifying which files to download. These can be either a constant value, range, or slice (e.g. '5', '8-20', or '1:24:3')", Args, true, false);
+        Argument UserName = new Argument("Username", Properties.Settings.Default.Username, "-u", "Username for sites that require authentication", Args, true, false);
+        Argument Password = new Argument("Password", Properties.Settings.Default.Password, "-p", "Password for sites that require authentication", Args, true, false);
+
 
         public class Argument
         {
@@ -232,7 +236,7 @@ namespace Gallery_dl_UI
             public bool Visible { get; }
             List<Argument> Container;
 
-            public Argument(string name, string value, string command, string description, List<Argument> container,bool visible, bool enabled = true)
+            public Argument(string name, string value, string command, string description, List<Argument> container, bool visible, bool enabled = true)
             {
                 Name = name;
                 Value = value;
@@ -364,6 +368,7 @@ namespace Gallery_dl_UI
         {
             tsbtnConfig.Image = Image.FromFile("images/config.png");
             tsbtnLog.Image = Image.FromFile("images/log.png");
+            tsbtnArgs.Image = Image.FromFile("images/args.png");
             btnClear.BackgroundImage = Image.FromFile("images/clear.png");
             btnClear.ImageAlign = ContentAlignment.MiddleCenter;
             btnClear.BackgroundImageLayout = ImageLayout.Stretch;
@@ -546,6 +551,29 @@ namespace Gallery_dl_UI
             }
             return count;
         }
+        private void OpenUrl(string url)
+        {
+            try
+            {
+                if (Uri.IsWellFormedUriString(url, UriKind.Absolute))
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = url,
+                        UseShellExecute = true
+                    });
+                }
+                else
+                {
+                    MessageBox.Show("La URL no es válida.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("No se pudo abrir el enlace.\n" + ex.Message);
+            }
+        }
+
 
         //TXB
         private void txbAddUrl_TextChanged(object sender, EventArgs e)
@@ -594,6 +622,98 @@ namespace Gallery_dl_UI
         {
             ArgsForm argsForm = new ArgsForm();
             argsForm.ShowDialog();
+        }
+        //Checks for updates
+        private void CheckGalleryDlUpdate()
+        {
+            try
+            {
+                // 1️⃣ Obtener versión instalada
+                var installedInfo = new ProcessStartInfo()
+                {
+                    FileName = "gallery-dl",
+                    Arguments = "--version",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true
+                };
+
+                string installedVersion;
+
+                using (var process = new Process())
+                {
+                    process.StartInfo = installedInfo;
+                    process.Start();
+                    string output = process.StandardOutput.ReadToEnd();
+                    process.WaitForExit();
+
+                    var match = Regex.Match(output, @"\d+\.\d+\.\d+");
+                    if (!match.Success)
+                        return;
+
+                    installedVersion = match.Value;
+                }
+
+                // 2️⃣ Obtener versión más reciente desde pip
+                var latestInfo = new ProcessStartInfo()
+                {
+                    FileName = "py",
+                    Arguments = "-m pip index versions gallery-dl",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true
+                };
+
+                string latestVersion = null;
+
+                using (var process = new Process())
+                {
+                    process.StartInfo = latestInfo;
+                    process.Start();
+                    string output = process.StandardOutput.ReadToEnd();
+                    process.WaitForExit();
+
+                    // Buscar línea LATEST: x.x.x
+                    var match = Regex.Match(output, @"LATEST:\s+(\d+\.\d+\.\d+)");
+                    if (match.Success)
+                        latestVersion = match.Groups[1].Value;
+                }
+
+                if (latestVersion == null)
+                    return;
+
+                // 3️⃣ Comparar versiones
+                Version installed = new Version(installedVersion);
+                Version latest = new Version(latestVersion);
+
+                if (installed < latest)
+                {
+                    MessageBox.Show(
+                        $"Nueva versión disponible.\n\nInstalada: {installed}\nÚltima: {latest}",
+                        "Actualización disponible",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information
+                    );
+                }
+            }
+            catch
+            {
+                // Opcional: manejar errores silenciosamente
+            }
+        }
+
+        private void dgvUrls_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.ColumnIndex < 0)
+                return;
+            if (e.Button == MouseButtons.Left)
+            {
+                OpenUrl(dgvUrls.Rows[e.RowIndex].Cells[1].Value.ToString());
+            }
+            else if (e.Button == MouseButtons.Right)
+            {
+                dgvUrls.Rows.RemoveAt(e.RowIndex);
+            }
         }
     }
 }

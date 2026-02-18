@@ -141,9 +141,11 @@ namespace Gallery_dl_UI
         {
             var startInfo = new ProcessStartInfo()
             {
-                FileName = "gallery-dl",
-                Arguments = "-U",
+                FileName = "powershell",
+                Arguments = "-Command \"py -m pip install --upgrade gallery-dl\"",
                 UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 CreateNoWindow = true
             };
 
@@ -151,7 +153,51 @@ namespace Gallery_dl_UI
             {
                 process.StartInfo = startInfo;
                 process.Start();
+
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+
+                process.WaitForExit();
+
+                MessageBox.Show(
+                    process.ExitCode == 0 ? "gallery-dl actualizado correctamente." : error,
+                    process.ExitCode == 0 ? "Actualización completada" : "Error",
+                    MessageBoxButtons.OK,
+                    process.ExitCode == 0 ? MessageBoxIcon.Information : MessageBoxIcon.Error
+                );
             }
+        }
+
+        private void btninstallGDl_Click(object sender, EventArgs e)
+        {
+            var startInfo = new ProcessStartInfo()
+            {
+                FileName = "powershell",
+                Arguments = "-Command \"py -m pip install gallery-dl\"",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            };
+
+            using (var process = new Process())
+            {
+                process.StartInfo = startInfo;
+                process.Start();
+
+                string output = process.StandardOutput.ReadToEnd();
+                string error = process.StandardError.ReadToEnd();
+
+                process.WaitForExit();
+
+                MessageBox.Show(
+                    process.ExitCode == 0 ? "gallery-dl instalado correctamente." : error,
+                    process.ExitCode == 0 ? "Instalación completada" : "Error",
+                    MessageBoxButtons.OK,
+                    process.ExitCode == 0 ? MessageBoxIcon.Information : MessageBoxIcon.Error
+                );
+            }
+
         }
     }
 }

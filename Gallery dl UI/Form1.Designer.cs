@@ -150,6 +150,7 @@
             dgvUrls.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvUrls.Size = new Size(374, 184);
             dgvUrls.TabIndex = 3;
+            dgvUrls.CellMouseClick += dgvUrls_CellMouseClick;
             // 
             // Site
             // 

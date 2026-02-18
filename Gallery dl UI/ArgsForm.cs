@@ -22,25 +22,23 @@ namespace Gallery_dl_UI
             GenerateArgumentUI(this);
 
             //Add event handlers for buttons
-            AttachArgumentButtonEvents(this, (arg) =>
+            AttachArgumentButtonEvents(
+            this,
+            Image.FromFile("images/folder.png"),
+            arg => arg.Command == "-d" || arg.Command == "-D",
+            arg =>
             {
-                if (arg.Command == "-d" || arg.Command == "-D")
+                
+                using (FolderBrowserDialog dlg = new FolderBrowserDialog())
                 {
-                    using (FolderBrowserDialog dlg = new FolderBrowserDialog())
+                    if (dlg.ShowDialog() == DialogResult.OK)
                     {
-                        if (dlg.ShowDialog() == DialogResult.OK)
-                        {
-                            arg.Value = dlg.SelectedPath;
-                            UpdateArgumentTextBox(this, arg); // refresca
-
-                        }
+                        arg.Value = dlg.SelectedPath;
+                        UpdateArgumentTextBox(this, arg);
                     }
                 }
-                else if (arg.Command == "")
-                {
-                    
-                }
             });
+
 
             WindowConfig();
             MainForm.FontChange(this);
@@ -188,14 +186,22 @@ namespace Gallery_dl_UI
             Properties.Settings.Default.Save();
         }
 
-        public void AttachArgumentButtonEvents(Control container, Action<Argument> customAction)
+        public void AttachArgumentButtonEvents(
+        Control container,
+        Image img,
+        Func<Argument, bool> filter,
+        Action<Argument> customAction)
         {
             foreach (Control pnl in container.Controls)
             {
                 foreach (Control ctrl in pnl.Controls)
                 {
-                    if (ctrl is Button btn && btn.Tag is Argument arg)
+                    if (ctrl is Button btn && btn.Tag is Argument arg && filter(arg))
                     {
+                        btn.BackgroundImage = img;
+                        btn.BackgroundImageLayout = ImageLayout.Stretch;
+                        btn.Text = "";
+
                         btn.Click += (s, e) =>
                         {
                             customAction?.Invoke(arg);
@@ -204,7 +210,6 @@ namespace Gallery_dl_UI
                 }
             }
         }
-
 
         private void ArgsForm_FormClosing(object sender, FormClosingEventArgs e)
         {
