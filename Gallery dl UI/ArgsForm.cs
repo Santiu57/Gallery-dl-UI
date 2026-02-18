@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Text;
+using System.Text.Json;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using static Gallery_dl_UI.MainForm;
@@ -42,14 +43,7 @@ namespace Gallery_dl_UI
 
             WindowConfig();
             MainForm.FontChange(this);
-            MainForm.TraverseAllControls(this, control =>
-            {
-                if (control is not Panel)
-                {
-                    control.BackColor = Properties.Settings.Default.MainBackColor;
-                    control.ForeColor = Properties.Settings.Default.MainForeColor;
-                }
-            });
+            MainForm.ColorComponents(this);
             this.Icon = MainForm.ConvertImageToIcon("images/icon.png");
         }
 

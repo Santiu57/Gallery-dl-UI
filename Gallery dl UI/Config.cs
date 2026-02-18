@@ -20,14 +20,7 @@ namespace Gallery_dl_UI
             this.Icon = MainForm.ConvertImageToIcon("images/icon.png");
             WindowConfig();
             FontChange();
-            MainForm.TraverseAllControls(this, control =>
-            {
-                if (control is not Panel)
-                {
-                    control.BackColor = Properties.Settings.Default.MainBackColor;
-                    control.ForeColor = Properties.Settings.Default.MainForeColor;
-                }
-            });
+            MainForm.ColorComponents(this);
         }
 
         private void label1_Click(object sender, EventArgs e)
@@ -198,6 +191,23 @@ namespace Gallery_dl_UI
                 );
             }
 
+        }
+
+        private void btnCreateConfig_Click(object sender, EventArgs e)
+        {
+            var startInfo = new ProcessStartInfo()
+            {
+                FileName = "gallery-dl",
+                Arguments = $"--config-create",
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using (var process = new Process())
+            {
+                process.StartInfo = startInfo;
+                process.Start();
+            }
         }
     }
 }

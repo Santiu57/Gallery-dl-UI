@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using WK.Libraries.SharpClipboardNS;
+using static Gallery_dl_UI.LogForm;
 
 namespace Gallery_dl_UI
 {
@@ -14,7 +15,7 @@ namespace Gallery_dl_UI
         public MainForm()
         {
             InitializeComponent();
-            ColorComponents();
+            ColorComponents(this);
             LoadImages();
             WindowConfig();
             FontChange(this);
@@ -58,7 +59,7 @@ namespace Gallery_dl_UI
             Config config = new Config();
             _currentScale = 1f;
             config.ShowDialog();
-            ColorComponents();
+            ColorComponents(this);
             if (btnStartdownload.Font != Properties.Settings.Default.MainFont)
             {
                 Application.Restart();
@@ -164,7 +165,7 @@ namespace Gallery_dl_UI
             int completed = 0;
             int total = Urls.Count;
 
-            ChangeStatusLabel($"En progreso... {0}/{total} Completadas");
+            ChangeStatusLabel($"{0}/{total} Completadas");
 
             var tasks = Urls.Select(async url =>
             {
@@ -174,7 +175,7 @@ namespace Gallery_dl_UI
 
                 Invoke(() =>
                 {
-                    ChangeStatusLabel($"En progreso... {done}/{total} Completadas");
+                    ChangeStatusLabel($"{done}/{total} Completadas");
                     RowChangeProgresBar(done, total);
                 });
 
@@ -197,7 +198,10 @@ namespace Gallery_dl_UI
             ChangeProgresBar(0);
         }
 
-
+        private void SaveLog()
+        {
+            
+        }
 
         //Args
         public static List<Argument> Args = new();
@@ -219,6 +223,7 @@ namespace Gallery_dl_UI
         Argument NoOverwrites = new Argument("No overwrites", " ", "--no-overwrites", "Skip files that already exist", Args, false);
         Argument NoProgress = new Argument("No Progress", " ", "--no-progress", "Removes console progress", Args, false);
         Argument ErrorLog = new Argument("Error Log", Properties.Settings.Default.ErrorLog, "-e", "Path to save error logs", Args, false);
+        Argument DumpJson = new Argument("Dump Json","", "-j", "Print JSON information",Args,false,false);
         Argument Retries = new Argument("Retries", Properties.Settings.Default.Retries, "-R", "Maximum number of retries for failed HTTP requests. -1 for infinite retries", Args, true);
         Argument Sleep = new Argument("Sleep", Properties.Settings.Default.Sleep, "--sleep", " Number of seconds to wait before each download. This can be either a constant value or a range (e.g. 2.7 or 2.0-3.5)", Args, true, false);
         Argument Range = new Argument("Range", Properties.Settings.Default.Range, "--range", "Index range(s) specifying which files to download. These can be either a constant value, range, or slice (e.g. '5', '8-20', or '1:24:3')", Args, true, false);
@@ -313,6 +318,7 @@ namespace Gallery_dl_UI
                     AddUrlToDGV(contenido);
 
                     NotificationShow("La URL fue copiada correctamente.", "Has añadido " + UrlCount() + " Urls", 500);
+                    CurrentUrlsUpd();
                 }
             }
         }
@@ -344,9 +350,9 @@ namespace Gallery_dl_UI
         {
             tsStatusLabel.Text = text;
         }
-        private void ColorComponents()
+        public static void ColorComponents(Control parent)
         {
-            TraverseAllControls(this, control =>
+            TraverseAllControls(parent, control =>
             {
                 if (control is not Panel)
                 {
@@ -451,6 +457,24 @@ namespace Gallery_dl_UI
                     ForceRefresh(control);
             }
         }
+        private void CurrentUrlsUpd()
+        {
+            ChangeStatusLabel($"{UrlCount()} Urls");
+        }
+        private void dgvUrls_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.ColumnIndex < 0)
+                return;
+            if (e.Button == MouseButtons.Left)
+            {
+                OpenUrl(dgvUrls.Rows[e.RowIndex].Cells[1].Value.ToString());
+            }
+            else if (e.Button == MouseButtons.Right)
+            {
+                dgvUrls.Rows.RemoveAt(e.RowIndex);
+                CurrentUrlsUpd();
+            }
+        }
 
         //Icon
         public static Icon ConvertImageToIcon(string imagePath, int size = 256)
@@ -551,7 +575,7 @@ namespace Gallery_dl_UI
             }
             return count;
         }
-        private void OpenUrl(string url)
+        public static void OpenUrl(string url)
         {
             try
             {
@@ -586,11 +610,6 @@ namespace Gallery_dl_UI
                 }
             }
             txbAddUrl.Clear();
-        }
-
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-
         }
 
         //Errors Manager
@@ -701,19 +720,10 @@ namespace Gallery_dl_UI
                 // Opcional: manejar errores silenciosamente
             }
         }
-
-        private void dgvUrls_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        private void tsbtnLog_Click(object sender, EventArgs e)
         {
-            if (e.RowIndex < 0 || e.ColumnIndex < 0)
-                return;
-            if (e.Button == MouseButtons.Left)
-            {
-                OpenUrl(dgvUrls.Rows[e.RowIndex].Cells[1].Value.ToString());
-            }
-            else if (e.Button == MouseButtons.Right)
-            {
-                dgvUrls.Rows.RemoveAt(e.RowIndex);
-            }
+            LogForm log = new LogForm();
+            log.ShowDialog();
         }
     }
 }

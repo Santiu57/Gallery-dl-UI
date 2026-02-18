@@ -103,6 +103,7 @@
             tsbtnLog.Size = new Size(29, 24);
             tsbtnLog.Text = "toolStripButton1";
             tsbtnLog.ToolTipText = "Log";
+            tsbtnLog.Click += tsbtnLog_Click;
             // 
             // btnStartdownload
             // 

@@ -44,6 +44,7 @@
             label4 = new Label();
             lblFontPreview = new Label();
             btninstallGDl = new Button();
+            btnCreateConfig = new Button();
             ((System.ComponentModel.ISupportInitialize)nudSimultaneousDownloads).BeginInit();
             SuspendLayout();
             // 
@@ -67,9 +68,9 @@
             // 
             // btnSave
             // 
-            btnSave.Location = new Point(343, 196);
+            btnSave.Location = new Point(343, 205);
             btnSave.Name = "btnSave";
-            btnSave.Size = new Size(85, 40);
+            btnSave.Size = new Size(85, 39);
             btnSave.TabIndex = 2;
             btnSave.Text = "Save";
             btnSave.UseVisualStyleBackColor = true;
@@ -129,9 +130,9 @@
             // 
             // btnUpdateGalleryDl
             // 
-            btnUpdateGalleryDl.Location = new Point(180, 196);
+            btnUpdateGalleryDl.Location = new Point(180, 205);
             btnUpdateGalleryDl.Name = "btnUpdateGalleryDl";
-            btnUpdateGalleryDl.Size = new Size(157, 40);
+            btnUpdateGalleryDl.Size = new Size(157, 39);
             btnUpdateGalleryDl.TabIndex = 9;
             btnUpdateGalleryDl.Text = "Update G-Dl";
             btnUpdateGalleryDl.UseVisualStyleBackColor = true;
@@ -167,19 +168,30 @@
             // 
             // btninstallGDl
             // 
-            btninstallGDl.Location = new Point(14, 196);
+            btninstallGDl.Location = new Point(14, 205);
             btninstallGDl.Name = "btninstallGDl";
-            btninstallGDl.Size = new Size(160, 40);
+            btninstallGDl.Size = new Size(160, 39);
             btninstallGDl.TabIndex = 13;
             btninstallGDl.Text = "Install G-Dl";
             btninstallGDl.UseVisualStyleBackColor = true;
             btninstallGDl.Click += btninstallGDl_Click;
             // 
+            // btnCreateConfig
+            // 
+            btnCreateConfig.Location = new Point(14, 160);
+            btnCreateConfig.Name = "btnCreateConfig";
+            btnCreateConfig.Size = new Size(170, 39);
+            btnCreateConfig.TabIndex = 14;
+            btnCreateConfig.Text = "Create Config";
+            btnCreateConfig.UseVisualStyleBackColor = true;
+            btnCreateConfig.Click += btnCreateConfig_Click;
+            // 
             // Config
             // 
             AutoScaleDimensions = new SizeF(14F, 28F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(433, 248);
+            ClientSize = new Size(433, 256);
+            Controls.Add(btnCreateConfig);
             Controls.Add(btninstallGDl);
             Controls.Add(lblFontPreview);
             Controls.Add(btnFontChange);
@@ -224,5 +236,6 @@
         private Label label4;
         private Label lblFontPreview;
         private Button btninstallGDl;
+        private Button btnCreateConfig;
     }
 }
