@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using WK.Libraries.SharpClipboardNS;
 using static Gallery_dl_UI.LogForm;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace Gallery_dl_UI
 {
@@ -176,6 +177,7 @@ namespace Gallery_dl_UI
                 Invoke(() =>
                 {
                     ChangeStatusLabel($"{done}/{total} Completadas");
+                    SaveLog(url);
                     RowChangeProgresBar(done, total);
                 });
 
@@ -198,9 +200,93 @@ namespace Gallery_dl_UI
             ChangeProgresBar(0);
         }
 
-        private void SaveLog()
+        //Log
+        public class Log
         {
-            
+            public DateTime Date { get; set; }
+            public string Site { get; set; }
+            public string Location { get; set; }
+            public string Url { get; set; }
+
+        public Log(string url)
+            {
+                Date = DateTime.Now;
+                Site = ExtractSiteName(url);
+                Location = getPath();
+                Url = url;
+            }
+             public string getPath()
+            {
+                string path = "";
+                Argument arg = DirectoryArgsFilter();
+                if ( arg != null)
+                {
+                    path = arg.Value;
+                }
+                else
+                {
+                    path = Path.Combine(
+                        Environment.CurrentDirectory,
+                        "gallery-dl");
+                }
+                return path;
+            }
+            public Argument DirectoryArgsFilter()
+            {
+                Argument arg = null;
+                var directoryArgs = Args.Where(a => a.Command == "-D" || a.Command == "-d").ToList();
+                var activeArgs = Args.Where(a => a.Enabled).ToList();
+                if (activeArgs.Count == 1) 
+                { 
+                    arg = activeArgs[0]; 
+                }
+                else if(activeArgs.Count == 2)
+                {
+                    arg = activeArgs[1];
+                }
+                return arg;
+            }
+            public void AddToSaveFile()
+            {
+                try
+                {
+                    string filePath = Path.Combine(
+                        Environment.CurrentDirectory,
+                        "log.json");
+
+                    List<Log> logs = new List<Log>();
+
+                    if (File.Exists(filePath))
+                    {
+                        string existingJson = File.ReadAllText(filePath);
+                        logs = JsonSerializer.Deserialize<List<Log>>(existingJson)
+                               ?? new List<Log>();
+                    }
+
+                    logs.Add(this);
+
+                    var options = new JsonSerializerOptions
+                    {
+                        WriteIndented = true
+                    };
+
+                    string json = JsonSerializer.Serialize(logs, options);
+                    File.WriteAllText(filePath, json);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        $"Error saving log:\n{ex.Message}",
+                        "Log Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                }
+            }
+        }
+        private void SaveLog(string url)
+        {
+            Log log = new Log(url);
+            log.AddToSaveFile();
         }
 
         //Args
@@ -223,7 +309,6 @@ namespace Gallery_dl_UI
         Argument NoOverwrites = new Argument("No overwrites", " ", "--no-overwrites", "Skip files that already exist", Args, false);
         Argument NoProgress = new Argument("No Progress", " ", "--no-progress", "Removes console progress", Args, false);
         Argument ErrorLog = new Argument("Error Log", Properties.Settings.Default.ErrorLog, "-e", "Path to save error logs", Args, false);
-        Argument DumpJson = new Argument("Dump Json","", "-j", "Print JSON information",Args,false,false);
         Argument Retries = new Argument("Retries", Properties.Settings.Default.Retries, "-R", "Maximum number of retries for failed HTTP requests. -1 for infinite retries", Args, true);
         Argument Sleep = new Argument("Sleep", Properties.Settings.Default.Sleep, "--sleep", " Number of seconds to wait before each download. This can be either a constant value or a range (e.g. 2.7 or 2.0-3.5)", Args, true, false);
         Argument Range = new Argument("Range", Properties.Settings.Default.Range, "--range", "Index range(s) specifying which files to download. These can be either a constant value, range, or slice (e.g. '5', '8-20', or '1:24:3')", Args, true, false);
@@ -303,9 +388,6 @@ namespace Gallery_dl_UI
             }
         }
 
-        //Config
-
-
         //Clipboard detector
         private void sharpClipboard1_ClipboardChanged(object sender, WK.Libraries.SharpClipboardNS.SharpClipboard.ClipboardChangedEventArgs e)
         {
@@ -317,7 +399,11 @@ namespace Gallery_dl_UI
                 {
                     AddUrlToDGV(contenido);
 
-                    NotificationShow("La URL fue copiada correctamente.", "Has añadido " + UrlCount() + " Urls", 500);
+                    int count = UrlCount();
+                    if(Properties.Settings.Default.NotificationPerLink != -1 && Properties.Settings.Default.NotificationPerLink > 0 && count % Properties.Settings.Default.NotificationPerLink == 0)
+                    {
+                        NotificationShow("La URL fue copiada correctamente.", "Has añadido " + count + " Urls", 500);
+                    }
                     CurrentUrlsUpd();
                 }
             }
@@ -723,7 +809,98 @@ namespace Gallery_dl_UI
         private void tsbtnLog_Click(object sender, EventArgs e)
         {
             LogForm log = new LogForm();
-            log.ShowDialog();
+            log.ShowDialog(); 
         }
+        public class MiniForm : Form
+        {
+            private readonly TableLayoutPanel _layout;
+            private readonly FlowLayoutPanel _buttonPanel;
+
+            public void MiniWindowConfig()
+            {
+                this.FormBorderStyle = FormBorderStyle.FixedSingle;
+                this.MaximizeBox = false;
+                this.MinimizeBox = true;
+                this.ControlBox = true;
+                this.ShowIcon = true;
+                this.Icon = MainForm.ConvertImageToIcon("images/icon.png");
+            }
+
+            public void FontAndColorMini()
+            {
+                MainForm.FontChange(this);
+                MainForm.TraverseAllControls(this, control =>
+                {
+                    if (control is not Panel)
+                    {
+                        control.BackColor = Properties.Settings.Default.MainBackColor;
+                        control.ForeColor = Properties.Settings.Default.MainForeColor;
+                    }
+                });
+            }
+            public MiniForm(string title = "")
+            {
+                Text = title;
+
+                FormBorderStyle = FormBorderStyle.FixedDialog;
+                StartPosition = FormStartPosition.CenterParent;
+
+                Size = new Size(320, 180);
+                MinimumSize = new Size(250, 140);
+
+                Padding = new Padding(10);
+
+                _layout = new TableLayoutPanel
+                {
+                    Dock = DockStyle.Fill,
+                    ColumnCount = 1,
+                    RowCount = 1,
+                    AutoSize = true,
+                    AutoSizeMode = AutoSizeMode.GrowAndShrink
+                };
+
+                _buttonPanel = new FlowLayoutPanel
+                {
+                    Dock = DockStyle.Bottom,
+                    FlowDirection = FlowDirection.RightToLeft,
+                    Height = 40
+                };
+
+                Controls.Add(_layout);
+                Controls.Add(_buttonPanel);
+            }
+
+            // 🔹 Agregar cualquier control
+            public void AddControl(Control control)
+            {
+                control.Dock = DockStyle.Fill;
+                control.Margin = new Padding(3, 6, 3, 6);
+
+                _layout.RowCount++;
+                _layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+                _layout.Controls.Add(control, 0, _layout.RowCount - 1);
+            }
+
+            // 🔹 Agregar botón
+            public Button AddButton(string text, Action onClick, bool closeOnClick = true)
+            {
+                var button = new Button
+                {
+                    Text = text,
+                    AutoSize = true
+                };
+
+                button.Click += (s, e) =>
+                {
+                    onClick?.Invoke();
+                    if (closeOnClick)
+                        Close();
+                };
+
+                _buttonPanel.Controls.Add(button);
+                return button;
+            }
+        }
+
     }
 }

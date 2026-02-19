@@ -40,6 +40,90 @@ namespace Gallery_dl_UI
                 }
             });
 
+            AttachArgumentButtonEvents(
+            this,
+            Image.FromFile("images/plus.png"),
+            arg => arg.Command == "--sleep",
+            arg => { },
+            arg => 
+            {
+                string safeName = arg.Name.Replace(" ", "");
+                string btnBoxName = "btn" + safeName;
+
+                var txb = this.Controls
+                    .Find(btnBoxName, true)
+                    .FirstOrDefault() as Button;
+                txb.Visible = false;
+            }
+            );
+
+            AttachArgumentButtonEvents(
+            this,
+            Image.FromFile("images/plus.png"),
+            arg => arg.Command == "-u",
+            arg => { },
+            arg =>
+            {
+                string safeName = arg.Name.Replace(" ", "");
+                string btnBoxName = "btn" + safeName;
+
+                var btn = this.Controls
+                    .Find(btnBoxName, true)
+                    .FirstOrDefault() as Button;
+                btn.Visible = false;
+            }
+            );
+
+            AttachArgumentButtonEvents(
+            this,
+            Image.FromFile("images/plus.png"),
+            arg => arg.Command == "-p",
+            arg => { },
+            arg =>
+            {
+                string safeName = arg.Name.Replace(" ", "");
+                string btnBoxName = "btn" + safeName;
+
+                var btn = this.Controls
+                    .Find(btnBoxName, true)
+                    .FirstOrDefault() as Button;
+                btn.Visible = false;
+            }
+            );
+
+            AttachArgumentButtonEvents(
+            this,
+            Image.FromFile("images/plus.png"),
+            arg => arg.Command == "-R",
+            arg => { },
+            arg =>
+            {
+                string safeName = arg.Name.Replace(" ", "");
+                string btnBoxName = "btn" + safeName;
+
+                var btn = this.Controls
+                    .Find(btnBoxName, true)
+                    .FirstOrDefault() as Button;
+                btn.Visible = false;
+            }
+            );
+
+            AttachArgumentButtonEvents(
+            this,
+            Image.FromFile("images/plus.png"),
+            arg => arg.Command == "--range",
+            arg => { },
+            arg =>
+            {
+                string safeName = arg.Name.Replace(" ", "");
+                string btnBoxName = "btn" + safeName;
+
+                var btn = this.Controls
+                    .Find(btnBoxName, true)
+                    .FirstOrDefault() as Button;
+                btn.Visible = false;
+            }
+            );
 
             WindowConfig();
             MainForm.FontChange(this);
@@ -184,7 +268,8 @@ namespace Gallery_dl_UI
         Control container,
         Image img,
         Func<Argument, bool> filter,
-        Action<Argument> customAction)
+        Action<Argument> customAction = null,
+        Action<Argument> extra = null)
         {
             foreach (Control pnl in container.Controls)
             {
@@ -200,6 +285,7 @@ namespace Gallery_dl_UI
                         {
                             customAction?.Invoke(arg);
                         };
+                        extra?.Invoke(arg);
                     }
                 }
             }
@@ -209,6 +295,18 @@ namespace Gallery_dl_UI
         {
             SaveArgumentsToSettings();
             MainForm.SaveArguments();
+        }
+
+        private void SleepMini()
+        {
+            MiniForm mini = new MiniForm("Sleep Config");
+            var numeric = new NumericUpDown
+            {
+                Minimum = 1,
+                Maximum = 10000,
+                Value = int.Parse(Properties.Settings.Default.Sleep),
+                Width = 120
+            };
         }
     }
 }

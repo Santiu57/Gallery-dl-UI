@@ -39,6 +39,21 @@ namespace Gallery_dl_UI
             pnlBackColor.BackColor = Properties.Settings.Default.MainBackColor;
             pnlForeColor.BackColor = Properties.Settings.Default.MainForeColor;
             fdLetteres.Font = Properties.Settings.Default.MainFont;
+            string roamingPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+            string configPath = Path.Combine(
+                roamingPath,
+                "gallery-dl",
+                "config.json");
+
+            if (File.Exists(configPath))
+            {
+                btnCreateConfig.Text = "Open Config";
+            }
+            else
+            {
+                // No existe
+            }
         }
         private void Config_FormClosing(object sender, FormClosingEventArgs e)
         {
@@ -195,19 +210,71 @@ namespace Gallery_dl_UI
 
         private void btnCreateConfig_Click(object sender, EventArgs e)
         {
-            var startInfo = new ProcessStartInfo()
+            if (btnCreateConfig.Text == "Open Config")
             {
-                FileName = "gallery-dl",
-                Arguments = $"--config-create",
-                UseShellExecute = false,
-                CreateNoWindow = true
+                string roamingPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                string configPath = Path.Combine(roamingPath, "gallery-dl", "config.json");
+                if (File.Exists(configPath))
+                {
+                    var startInfo = new ProcessStartInfo()
+                    {
+                        FileName = "gallery-dl",
+                        Arguments = $"--config-open",
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+
+                    using (var process = new Process())
+                    {
+                        process.StartInfo = startInfo;
+                        process.Start();
+                    }
+                }
+            }
+            else
+            {
+                var startInfo = new ProcessStartInfo()
+                {
+                    FileName = "gallery-dl",
+                    Arguments = $"--config-create",
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using (var process = new Process())
+                {
+                    process.StartInfo = startInfo;
+                    process.Start();
+                }
+            }
+            
+        }
+
+        private void btnNotifications_Click(object sender, EventArgs e)
+        {
+            var mini = new MiniForm("Notification Config");
+
+            var numeric = new NumericUpDown
+            {
+                Minimum = -1,
+                Maximum = 10000,
+                Value = Properties.Settings.Default.NotificationPerLink,
+                Width = 120
             };
 
-            using (var process = new Process())
+            mini.AddControl(new Label { Text = "Notify every x copied Urls:" });
+            mini.AddControl(numeric);
+
+            mini.AddButton("Save", () =>
             {
-                process.StartInfo = startInfo;
-                process.Start();
-            }
+                Properties.Settings.Default.NotificationPerLink = (int)numeric.Value;
+                Properties.Settings.Default.Save();
+            });
+
+            mini.FontAndColorMini();
+            mini.MiniWindowConfig();
+
+            mini.ShowDialog();
         }
     }
 }

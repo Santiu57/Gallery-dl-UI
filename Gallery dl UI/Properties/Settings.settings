@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="DestinationPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\Users\santi\Downloads\gallery-dl</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="DirectoryPath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -33,7 +33,7 @@
       <Value Profile="(Default)">4</Value>
     </Setting>
     <Setting Name="Sleep" Type="System.String" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="Range" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -43,6 +43,9 @@
     </Setting>
     <Setting Name="Password" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="NotificationPerLink" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1</Value>
     </Setting>
   </Settings>
 </SettingsFile>

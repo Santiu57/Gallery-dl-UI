@@ -29,20 +29,19 @@
         private void InitializeComponent()
         {
             dgvLog = new DataGridView();
-            Date = new DataGridViewTextBoxColumn();
-            Site = new DataGridViewTextBoxColumn();
-            Location = new DataGridViewTextBoxColumn();
-            Url = new DataGridViewTextBoxColumn();
+            btnDeleteLog = new Button();
             ((System.ComponentModel.ISupportInitialize)dgvLog).BeginInit();
             SuspendLayout();
             // 
             // dgvLog
             // 
             dgvLog.AllowUserToAddRows = false;
+            dgvLog.AllowUserToOrderColumns = true;
+            dgvLog.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvLog.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvLog.Columns.AddRange(new DataGridViewColumn[] { Date, Site, Location, Url });
             dgvLog.Location = new Point(12, 12);
             dgvLog.Name = "dgvLog";
+            dgvLog.ReadOnly = true;
             dgvLog.RowHeadersVisible = false;
             dgvLog.RowHeadersWidth = 51;
             dgvLog.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
@@ -50,39 +49,21 @@
             dgvLog.TabIndex = 4;
             dgvLog.CellMouseClick += dgvLog_CellMouseClick;
             // 
-            // Date
+            // btnDeleteLog
             // 
-            Date.HeaderText = "Date";
-            Date.MinimumWidth = 6;
-            Date.Name = "Date";
-            Date.Width = 175;
-            // 
-            // Site
-            // 
-            Site.HeaderText = "Site";
-            Site.MinimumWidth = 6;
-            Site.Name = "Site";
-            Site.Width = 120;
-            // 
-            // Location
-            // 
-            Location.HeaderText = "Location";
-            Location.MinimumWidth = 6;
-            Location.Name = "Location";
-            Location.Width = 175;
-            // 
-            // Url
-            // 
-            Url.HeaderText = "Url";
-            Url.MinimumWidth = 6;
-            Url.Name = "Url";
-            Url.Width = 250;
+            btnDeleteLog.Location = new Point(697, 263);
+            btnDeleteLog.Name = "btnDeleteLog";
+            btnDeleteLog.Size = new Size(38, 29);
+            btnDeleteLog.TabIndex = 5;
+            btnDeleteLog.UseVisualStyleBackColor = true;
+            btnDeleteLog.Click += btnDeleteLog_Click;
             // 
             // LogForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(748, 328);
+            Controls.Add(btnDeleteLog);
             Controls.Add(dgvLog);
             Name = "LogForm";
             Text = "LogForm";
@@ -93,9 +74,6 @@
         #endregion
 
         private DataGridView dgvLog;
-        private DataGridViewTextBoxColumn Date;
-        private DataGridViewTextBoxColumn Site;
-        private DataGridViewTextBoxColumn Location;
-        private DataGridViewTextBoxColumn Url;
+        private Button btnDeleteLog;
     }
 }

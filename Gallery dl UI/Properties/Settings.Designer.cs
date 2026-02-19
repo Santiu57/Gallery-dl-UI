@@ -25,7 +25,7 @@ namespace Gallery_dl_UI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("C:\\Users\\santi\\Downloads\\gallery-dl")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string DestinationPath {
             get {
                 return ((string)(this["DestinationPath"]));
@@ -144,7 +144,7 @@ namespace Gallery_dl_UI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public string Sleep {
             get {
                 return ((string)(this["Sleep"]));
@@ -187,6 +187,18 @@ namespace Gallery_dl_UI.Properties {
             }
             set {
                 this["Password"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int NotificationPerLink {
+            get {
+                return ((int)(this["NotificationPerLink"]));
+            }
+            set {
+                this["NotificationPerLink"] = value;
             }
         }
     }

@@ -142,6 +142,7 @@
             // dgvUrls
             // 
             dgvUrls.AllowUserToAddRows = false;
+            dgvUrls.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvUrls.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvUrls.Columns.AddRange(new DataGridViewColumn[] { Site, Url });
             dgvUrls.Location = new Point(0, 32);
@@ -158,14 +159,14 @@
             Site.HeaderText = "Site";
             Site.MinimumWidth = 6;
             Site.Name = "Site";
-            Site.Width = 120;
+            Site.Width = 65;
             // 
             // Url
             // 
             Url.HeaderText = "Url";
             Url.MinimumWidth = 6;
             Url.Name = "Url";
-            Url.Width = 250;
+            Url.Width = 57;
             // 
             // btnClear
             // 

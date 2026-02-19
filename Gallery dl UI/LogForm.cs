@@ -15,10 +15,12 @@ namespace Gallery_dl_UI
         public LogForm()
         {
             InitializeComponent();
+            this.Icon = MainForm.ConvertImageToIcon("images/icon.png");
+            WindowConfig();
             MainForm.FontChange(this);
             MainForm.ColorComponents(this);
-            WindowConfig();
-            LoadHistory(dgvLog,"history.log");
+            LoadLog(dgvLog);
+            BtnsPaint();
         }
 
         private void WindowConfig()
@@ -28,6 +30,11 @@ namespace Gallery_dl_UI
             this.MinimizeBox = true;
             this.ControlBox = true;
             this.ShowIcon = true;
+        }
+        private void BtnsPaint()
+        {
+            btnDeleteLog.BackgroundImage = Image.FromFile("images/clear.png");
+            btnDeleteLog.BackgroundImageLayout = ImageLayout.Stretch;
         }
         public static void OpenLocation(string path)
         {
@@ -68,14 +75,39 @@ namespace Gallery_dl_UI
                 MessageBox.Show("No se pudo abrir la ubicación.\n" + ex.Message);
             }
         }
+        private void LoadLog(DataGridView dgv)
+        {
+            try
+            {
+                string filePath = Path.Combine(
+                    Environment.CurrentDirectory,
+                    "log.json");
+
+                if (!File.Exists(filePath))
+                    return;
+
+                string json = File.ReadAllText(filePath);
+
+                var logs = JsonSerializer.Deserialize<List<MainForm.Log>>(json);
+
+                dgv.AutoGenerateColumns = true;
+                dgv.DataSource = logs;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Error loading log:\n{ex.Message}",
+                    "Log Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
 
         private void dgvLog_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if(e.RowIndex == 0 || e.ColumnIndex == 0 || e.ColumnIndex == 1)
-                { return; }
-            if(e.ColumnIndex == 2)
+            if (e.RowIndex < 0)
             {
-
+                return;
             }
             switch (e.ColumnIndex)
             {
@@ -84,40 +116,11 @@ namespace Gallery_dl_UI
                 default: return;
             }
         }
-        public class HistoryItem
+
+        private void btnDeleteLog_Click(object sender, EventArgs e)
         {
-            public DateTime Date { get; set; }
-            public string Site { get; set; }
-            public string Location { get; set; }
-            public string Url { get; set; }
-        }
-        public static void AppendHistory(HistoryItem item, string filePath)
-        {
-            string jsonLine = JsonSerializer.Serialize(item);
-
-            File.AppendAllText(filePath, jsonLine + Environment.NewLine);
-        }
-        public static void LoadHistory(DataGridView dgv, string filePath)
-        {
-            if (!File.Exists(filePath))
-                return;
-
-            dgv.Rows.Clear();
-
-            foreach (var line in File.ReadLines(filePath))
-            {
-                if (string.IsNullOrWhiteSpace(line))
-                    continue;
-
-                var item = JsonSerializer.Deserialize<HistoryItem>(line);
-
-                dgv.Rows.Add(
-                    item.Date,
-                    item.Site,
-                    item.Location,
-                    item.Url
-                );
-            }
+            File.Delete("log.json");
+            LoadLog(dgvLog);
         }
     }
 }
