@@ -125,6 +125,46 @@ namespace Gallery_dl_UI
             }
             );
 
+            AttachArgumentButtonEvents(
+            this,
+            Image.FromFile("images/plus.png"),
+            arg => arg.Command == "-f",
+            arg =>
+            {
+                NameFileMini(arg);
+            },
+            arg =>
+            {
+                string safeName = arg.Name.Replace(" ", "");
+                string panelName = "pnl" + safeName;
+                string btnName = "btn" + safeName;
+
+                var panel = this.Controls.Find(panelName, true).FirstOrDefault() as Panel;
+                var originalBtn = this.Controls.Find(btnName, true).FirstOrDefault() as Button;
+
+                if (panel != null && originalBtn != null)
+                {
+                    Button ClearBtn = new Button
+                    {
+                        Width = 30,
+                        Height = 25,
+                        Location = new Point(originalBtn.Left - 35, originalBtn.Top),
+                        BackgroundImage = Image.FromFile("images/clear.png"),
+                        BackgroundImageLayout = ImageLayout.Stretch,
+                        Tag = arg
+                    };
+
+                    ClearBtn.Click += (s, e) =>
+                    {
+                        arg.Value = "";
+                        UpdateArgumentTextBox(this, arg);
+                    };
+
+                    panel.Controls.Add(ClearBtn);
+                    ClearBtn.BringToFront();
+                }
+            });
+
             WindowConfig();
             MainForm.FontChange(this);
             MainForm.ColorComponents(this);
@@ -297,16 +337,211 @@ namespace Gallery_dl_UI
             MainForm.SaveArguments();
         }
 
-        private void SleepMini()
+        private Button Createbtn(string text, Action click)
         {
-            MiniForm mini = new MiniForm("Sleep Config");
-            var numeric = new NumericUpDown
-            {
-                Minimum = 1,
-                Maximum = 10000,
-                Value = int.Parse(Properties.Settings.Default.Sleep),
-                Width = 120
-            };
+            Button btn = new Button();
+            btn.Text = text;
+            btn.Click += (s, e) => click();
+            return btn;
         }
+        private void NameFileMini(Argument arg)
+        {
+            MiniForm mini = new MiniForm("File naming");
+
+            mini.SuspendLayout();
+
+            foreach (var category in GalleryDlFields)
+            {
+                var fields = category.Value;
+                mini.AddControl(new Label() { Text = category.Key });
+
+                for (int i = 0; i < fields.Count; i++)
+                {
+                    string f = fields[i];
+                    bool isLast = i == fields.Count - 1;
+
+                    Button btn = Createbtn(f, () =>
+                    {
+                        if (f == "extension")
+                            arg.Value += $".{{{f}}}";
+                        else
+                            arg.Value += $"{{{f}}}";
+
+                        UpdateArgumentTextBox(this, arg);
+                    });
+                    if (isLast)
+                    {
+                        mini.AddControl(btn,true);
+                    }
+                    else
+                    {
+                        mini.AddControl(btn);
+                    }
+                }
+
+            }
+
+            mini.MaximumSize = new Size(800, 800);
+
+            mini.ResumeLayout();
+            mini.FontAndColorMini();
+
+            mini.Show();
+        }
+
+
+        Dictionary<string, List<string>> GalleryDlFields = new()
+        {
+            ["Identifiers"] = new()
+        {
+            "id",
+            "post_id",
+            "media_id",
+            "image_id",
+            "illust_id",
+            "tweet_id",
+            "status_id",
+            "submission_id",
+            "comment_id",
+            "parent_id",
+            "conversation_id",
+            "gallery_id",
+            "album_id",
+            "chapter_id",
+            "series_id",
+            "volume_id",
+            "user_id",
+            "uploader_id"
+        },
+
+            ["Indexing"] = new()
+        {
+            "num",
+            "index",
+            "position",
+            "page",
+            "page_count",
+            "chapter",
+            "chapter_number",
+            "volume",
+            "volume_number",
+            "part",
+            "episode"
+        },
+
+            ["File"] = new()
+        {
+            "filename",
+            "basename",
+            "extension",
+            "file_extension",
+            "directory",
+            "path",
+            "md5",
+            "sha1",
+            "sha256"
+        },
+
+            ["File Properties"] = new()
+        {
+            "width",
+            "height",
+            "filesize",
+            "filesize_approx",
+            "duration",
+            "fps",
+            "bitrate",
+            "format",
+            "mimetype"
+        },
+
+            ["Date & Time"] = new()
+        {
+            "date",
+            "datetime",
+            "timestamp",
+            "year",
+            "month",
+            "day",
+            "hour",
+            "minute",
+            "second",
+            "week",
+            "weekday"
+        },
+
+            ["User / Author"] = new()
+        {
+            "author",
+            "artist",
+            "creator",
+            "user",
+            "username",
+            "account",
+            "profile",
+            "nickname",
+            "display_name",
+            "uploader",
+            "group"
+        },
+
+            ["Content"] = new()
+        {
+            "title",
+            "caption",
+            "description",
+            "commentary",
+            "text",
+            "body",
+            "summary",
+            "note",
+            "language",
+            "type",
+            "category",
+            "subcategory",
+            "rating"
+        },
+
+            ["Tags"] = new()
+        {
+            "tags",
+            "tag_string",
+            "tagged",
+            "character",
+            "characters",
+            "series",
+            "copyright",
+            "genre",
+            "species",
+            "meta"
+        },
+
+            ["Metrics"] = new()
+        {
+            "score",
+            "favorites",
+            "favorite_count",
+            "likes",
+            "like_count",
+            "views",
+            "view_count",
+            "retweets",
+            "reposts",
+            "comments",
+            "comment_count",
+            "bookmark_count",
+            "download_count"
+        },
+
+            ["Source"] = new()
+        {
+            "source",
+            "url",
+            "original_url",
+            "referer",
+            "webpage_url",
+            "source_url"
+        }
+        };
     }
 }

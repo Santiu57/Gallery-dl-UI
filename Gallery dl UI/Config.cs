@@ -247,33 +247,44 @@ namespace Gallery_dl_UI
                     process.Start();
                 }
             }
-            
+
         }
 
         private void btnNotifications_Click(object sender, EventArgs e)
         {
             var mini = new MiniForm("Notification Config");
 
+            var row = new FlowLayoutPanel
+            {
+                AutoSize = true,
+                FlowDirection = FlowDirection.LeftToRight,
+                WrapContents = false
+            };
+
             var numeric = new NumericUpDown
             {
                 Minimum = -1,
                 Maximum = 10000,
                 Value = Properties.Settings.Default.NotificationPerLink,
-                Width = 120
+                Width = 60
             };
 
-            mini.AddControl(new Label { Text = "Notify every x copied Urls:" });
-            mini.AddControl(numeric);
+            row.Controls.Add(new Label { Text = "Notify every", AutoSize = true });
+            row.Controls.Add(numeric);
+            row.Controls.Add(new Label { Text = "copied URLs", AutoSize = true });
 
-            mini.AddButton("Save", () =>
+            mini.AddControl(row);
+
+            mini.FormClosing += (s, e) =>
             {
                 Properties.Settings.Default.NotificationPerLink = (int)numeric.Value;
                 Properties.Settings.Default.Save();
-            });
+            };
 
             mini.FontAndColorMini();
             mini.MiniWindowConfig();
 
+            mini.MaximumSize = new Size(mini.Width, 200);
             mini.ShowDialog();
         }
     }

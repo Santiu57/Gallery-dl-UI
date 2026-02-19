@@ -813,8 +813,7 @@ namespace Gallery_dl_UI
         }
         public class MiniForm : Form
         {
-            private readonly TableLayoutPanel _layout;
-            private readonly FlowLayoutPanel _buttonPanel;
+            private readonly FlowLayoutPanel FieldPanel;
 
             public void MiniWindowConfig()
             {
@@ -838,6 +837,7 @@ namespace Gallery_dl_UI
                     }
                 });
             }
+
             public MiniForm(string title = "")
             {
                 Text = title;
@@ -845,62 +845,35 @@ namespace Gallery_dl_UI
                 FormBorderStyle = FormBorderStyle.FixedDialog;
                 StartPosition = FormStartPosition.CenterParent;
 
-                Size = new Size(320, 180);
-                MinimumSize = new Size(250, 140);
+                AutoScaleMode = AutoScaleMode.Font;
 
+                AutoSize = true;
+                MaximumSize = new Size(800, 800);
                 Padding = new Padding(10);
 
-                _layout = new TableLayoutPanel
-                {
-                    Dock = DockStyle.Fill,
-                    ColumnCount = 1,
-                    RowCount = 1,
-                    AutoSize = true,
-                    AutoSizeMode = AutoSizeMode.GrowAndShrink
-                };
+                FlowLayoutPanel fieldPanel = new FlowLayoutPanel();
+                fieldPanel.FlowDirection = FlowDirection.TopDown;
+                fieldPanel.AutoSize = true;
+                fieldPanel.Margin = new Padding(0);
+                fieldPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+                fieldPanel.WrapContents = true;
+                fieldPanel.Dock = DockStyle.Fill;
+                fieldPanel.AutoScroll = true;
 
-                _buttonPanel = new FlowLayoutPanel
-                {
-                    Dock = DockStyle.Bottom,
-                    FlowDirection = FlowDirection.RightToLeft,
-                    Height = 40
-                };
+                FieldPanel = fieldPanel;
 
-                Controls.Add(_layout);
-                Controls.Add(_buttonPanel);
+                this.Controls.Add(FieldPanel);
             }
+
 
             // 🔹 Agregar cualquier control
-            public void AddControl(Control control)
+            public void AddControl(Control control, bool flow = false)
             {
-                control.Dock = DockStyle.Fill;
-                control.Margin = new Padding(3, 6, 3, 6);
-
-                _layout.RowCount++;
-                _layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-                _layout.Controls.Add(control, 0, _layout.RowCount - 1);
-            }
-
-            // 🔹 Agregar botón
-            public Button AddButton(string text, Action onClick, bool closeOnClick = true)
-            {
-                var button = new Button
-                {
-                    Text = text,
-                    AutoSize = true
-                };
-
-                button.Click += (s, e) =>
-                {
-                    onClick?.Invoke();
-                    if (closeOnClick)
-                        Close();
-                };
-
-                _buttonPanel.Controls.Add(button);
-                return button;
+                control.AutoSize = true;
+                control.Margin = new Padding(6);
+                FieldPanel.Controls.Add(control);
+                FieldPanel.SetFlowBreak(control, flow);
             }
         }
-
     }
 }
