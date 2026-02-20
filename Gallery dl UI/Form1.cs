@@ -288,6 +288,7 @@ namespace Gallery_dl_UI
 
         void BuilArgs()
         {
+            Arguments = "";
             foreach (var arg in Args)
             {
                 string cmd = arg.ToCommandString();
@@ -307,6 +308,8 @@ namespace Gallery_dl_UI
         Argument Range = new Argument("Range", Properties.Settings.Default.Range, "--range", "Index range(s) specifying which files to download. These can be either a constant value, range, or slice (e.g. '5', '8-20', or '1:24:3')", Args, true, false);
         Argument UserName = new Argument("Username", Properties.Settings.Default.Username, "-u", "Username for sites that require authentication", Args, true, false);
         Argument Password = new Argument("Password", Properties.Settings.Default.Password, "-p", "Password for sites that require authentication", Args, true, false);
+        Argument BrowserCookies = new Argument("Cookies from Browser", Properties.Settings.Default.BrowserCookies, "--cookies-from-browser", "Use cookies from a supported browser to authenticate requests. (e.g. 'edge' or 'firefox')", Args, true, true);
+
 
 
         public class Argument
@@ -713,9 +716,14 @@ namespace Gallery_dl_UI
                 foreach (string UrlError in errorLines)
                 {
                     AddUrlToDGV(UrlError);
-                    if (ExtractSiteName(UrlError) == "pixiv")
+                    switch (ExtractSiteName(UrlError))
                     {
-                        PixivTokenMissing();
+                        case "pixiv":
+                            PixivTokenMissing();
+                            break;
+                        case "x":
+                            MessageBox.Show("Twitter ha cambiado su sistema de autenticación, es necesario añadir las cookies de tu navegador para seguir descargando de esta plataforma", "Twitter Error");
+                            break;
                     }
                 }
                 File.Delete(errorLogPath);
@@ -774,7 +782,6 @@ namespace Gallery_dl_UI
                     process.StartInfo = installedInfo;
                     process.Start();
                     string output = process.StandardOutput.ReadToEnd();
-                    process.WaitForExit();
 
                     var match = Regex.Match(output, @"\d+\.\d+\.\d+");
                     if (!match.Success)
@@ -800,7 +807,6 @@ namespace Gallery_dl_UI
                     process.StartInfo = latestInfo;
                     process.Start();
                     string output = process.StandardOutput.ReadToEnd();
-                    process.WaitForExit();
 
                     // Buscar línea LATEST: x.x.x
                     var match = Regex.Match(output, @"LATEST:\s+(\d+\.\d+\.\d+)");

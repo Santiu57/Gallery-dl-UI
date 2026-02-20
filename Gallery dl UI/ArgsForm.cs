@@ -22,6 +22,24 @@ namespace Gallery_dl_UI
         {
             GenerateArgumentUI(this);
 
+            //Makes invisible the buttons for arguments that don't have to much configuration
+            AttachArgumentButtonEvents(
+            this,
+            Image.FromFile("images/plus.png"),
+            arg => NoBtnFields.Contains(arg.Command),
+            arg => { },
+            arg =>
+            {
+                string safeName = arg.Name.Replace(" ", "");
+                string btnBoxName = "btn" + safeName;
+
+                var btn = this.Controls
+                    .Find(btnBoxName, true)
+                    .FirstOrDefault() as Button;
+                btn.Visible = false;
+            }
+            );
+
             //Add event handlers for buttons
             AttachArgumentButtonEvents(
             this,
@@ -39,91 +57,6 @@ namespace Gallery_dl_UI
                     }
                 }
             });
-
-            AttachArgumentButtonEvents(
-            this,
-            Image.FromFile("images/plus.png"),
-            arg => arg.Command == "--sleep",
-            arg => { },
-            arg => 
-            {
-                string safeName = arg.Name.Replace(" ", "");
-                string btnBoxName = "btn" + safeName;
-
-                var txb = this.Controls
-                    .Find(btnBoxName, true)
-                    .FirstOrDefault() as Button;
-                txb.Visible = false;
-            }
-            );
-
-            AttachArgumentButtonEvents(
-            this,
-            Image.FromFile("images/plus.png"),
-            arg => arg.Command == "-u",
-            arg => { },
-            arg =>
-            {
-                string safeName = arg.Name.Replace(" ", "");
-                string btnBoxName = "btn" + safeName;
-
-                var btn = this.Controls
-                    .Find(btnBoxName, true)
-                    .FirstOrDefault() as Button;
-                btn.Visible = false;
-            }
-            );
-
-            AttachArgumentButtonEvents(
-            this,
-            Image.FromFile("images/plus.png"),
-            arg => arg.Command == "-p",
-            arg => { },
-            arg =>
-            {
-                string safeName = arg.Name.Replace(" ", "");
-                string btnBoxName = "btn" + safeName;
-
-                var btn = this.Controls
-                    .Find(btnBoxName, true)
-                    .FirstOrDefault() as Button;
-                btn.Visible = false;
-            }
-            );
-
-            AttachArgumentButtonEvents(
-            this,
-            Image.FromFile("images/plus.png"),
-            arg => arg.Command == "-R",
-            arg => { },
-            arg =>
-            {
-                string safeName = arg.Name.Replace(" ", "");
-                string btnBoxName = "btn" + safeName;
-
-                var btn = this.Controls
-                    .Find(btnBoxName, true)
-                    .FirstOrDefault() as Button;
-                btn.Visible = false;
-            }
-            );
-
-            AttachArgumentButtonEvents(
-            this,
-            Image.FromFile("images/plus.png"),
-            arg => arg.Command == "--range",
-            arg => { },
-            arg =>
-            {
-                string safeName = arg.Name.Replace(" ", "");
-                string btnBoxName = "btn" + safeName;
-
-                var btn = this.Controls
-                    .Find(btnBoxName, true)
-                    .FirstOrDefault() as Button;
-                btn.Visible = false;
-            }
-            );
 
             AttachArgumentButtonEvents(
             this,
@@ -163,6 +96,15 @@ namespace Gallery_dl_UI
                     panel.Controls.Add(ClearBtn);
                     ClearBtn.BringToFront();
                 }
+            });
+
+            AttachArgumentButtonEvents(
+            this,
+            Image.FromFile("images/plus.png"),
+            arg => arg.Command == "--cookies-from-browser",
+            arg =>
+            {
+                BrowserCoookiesMini(arg);
             });
 
             WindowConfig();
@@ -402,6 +344,43 @@ namespace Gallery_dl_UI
             mini.Show();
         }
 
+        private void BrowserCoookiesMini(Argument arg)
+        {
+            MiniForm mini = new MiniForm("Supported Browsers");
+
+            foreach (var browser in SupportedBrowsers)
+            {
+                Button btn = Createbtn(browser, () =>
+                {
+                    arg.Value = browser;
+                    UpdateArgumentTextBox(this, arg);
+                });
+                mini.AddControl(btn, true);
+            }
+            mini.MaximumSize = new Size(mini.Width, 200);
+            mini.MiniWindowConfig();
+            mini.FontAndColorMini();
+            mini.Show();
+        }
+
+        List<string> NoBtnFields = new()
+        {
+            "--sleep",
+            "-u",
+            "-p",
+            "-R",
+            "--range"
+        };
+
+        List<string> SupportedBrowsers = new List<string>
+        {
+            "chromium",
+            "edge",
+            "brave",
+            "opera",
+            "vivaldi",
+            "firefox"
+        };
 
         Dictionary<string, List<string>> GalleryDlFields = new()
         {

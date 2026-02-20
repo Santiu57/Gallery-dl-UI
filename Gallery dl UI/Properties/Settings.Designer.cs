@@ -201,5 +201,29 @@ namespace Gallery_dl_UI.Properties {
                 this["NotificationPerLink"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string BrowserCookies {
+            get {
+                return ((string)(this["BrowserCookies"]));
+            }
+            set {
+                this["BrowserCookies"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string Cookies {
+            get {
+                return ((string)(this["Cookies"]));
+            }
+            set {
+                this["Cookies"] = value;
+            }
+        }
     }
 }
