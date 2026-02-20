@@ -713,6 +713,10 @@ namespace Gallery_dl_UI
                 foreach (string UrlError in errorLines)
                 {
                     AddUrlToDGV(UrlError);
+                    if (ExtractSiteName(UrlError) == "pixiv")
+                    {
+                        PixivTokenMissing();
+                    }
                 }
                 File.Delete(errorLogPath);
                 PaintErrors();
@@ -722,6 +726,24 @@ namespace Gallery_dl_UI
             {
                 MessageBox.Show("Error al leer el archivo: " + ex.Message);
                 return true;
+            }
+        }
+
+        private void PixivTokenMissing()
+        {
+            MessageBox.Show("Comprueba o añade tu refresh-token de Pixiv, \nSigue las instrucciones del CMD", "Pixiv Error");
+            var startInfo = new ProcessStartInfo()
+            {
+                FileName = "gallery-dl",
+                Arguments = "oauth:pixiv",
+                UseShellExecute = false,
+                CreateNoWindow = false
+            };
+            
+            using (var process = new Process())
+            {
+                process.StartInfo = startInfo;
+                process.Start();
             }
         }
 
