@@ -133,7 +133,7 @@ namespace Gallery_dl_UI
             {
                 NameFileMini(arg);
             },
-            arg =>
+             arg =>
             {
                 string safeName = arg.Name.Replace(" ", "");
                 string panelName = "pnl" + safeName;
@@ -333,6 +333,20 @@ namespace Gallery_dl_UI
 
         private void ArgsForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            var filenameArg = MainForm.Args
+            .FirstOrDefault(a => a.Command == "-f");
+
+            if (filenameArg != null && !string.IsNullOrWhiteSpace(filenameArg.Value) && filenameArg.Enabled)
+            {
+                var value = filenameArg.Value.Trim();
+
+                if (!value.Contains("{extension}"))
+                {
+                    value = value.TrimEnd('.');
+
+                    filenameArg.Value = value + ".{extension}";
+                }
+            }
             SaveArgumentsToSettings();
             MainForm.SaveArguments();
         }
@@ -347,8 +361,6 @@ namespace Gallery_dl_UI
         private void NameFileMini(Argument arg)
         {
             MiniForm mini = new MiniForm("File naming");
-
-            mini.SuspendLayout();
 
             foreach (var category in GalleryDlFields)
             {
@@ -371,21 +383,22 @@ namespace Gallery_dl_UI
                     });
                     if (isLast)
                     {
-                        mini.AddControl(btn,true);
+                        mini.AddControl(btn, true);
                     }
                     else
                     {
                         mini.AddControl(btn);
                     }
                 }
-
             }
+            mini.AddButton("folder", () => { arg.Value += "/"; UpdateArgumentTextBox(this, arg); }, false);
 
             mini.MaximumSize = new Size(800, 800);
 
-            mini.ResumeLayout();
             mini.FontAndColorMini();
-
+            mini.MiniWindowConfig();
+            if (Application.OpenForms.OfType<MiniForm>().Any())
+                return;
             mini.Show();
         }
 

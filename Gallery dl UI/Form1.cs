@@ -236,14 +236,7 @@ namespace Gallery_dl_UI
                 Argument arg = null;
                 var directoryArgs = Args.Where(a => a.Command == "-D" || a.Command == "-d").ToList();
                 var activeArgs = Args.Where(a => a.Enabled).ToList();
-                if (activeArgs.Count == 1) 
-                { 
-                    arg = activeArgs[0]; 
-                }
-                else if(activeArgs.Count == 2)
-                {
-                    arg = activeArgs[1];
-                }
+                arg = activeArgs[0]; 
                 return arg;
             }
             public void AddToSaveFile()
@@ -418,6 +411,15 @@ namespace Gallery_dl_UI
             trayIcon.BalloonTipTitle = Title;
             trayIcon.BalloonTipText = Text;
             trayIcon.BalloonTipIcon = ToolTipIcon.Info;
+            trayIcon.BalloonTipClicked += (s, e) =>
+            {
+                this.Invoke((MethodInvoker)delegate
+                {
+                    this.WindowState = FormWindowState.Normal;
+                    this.Show();
+                    this.BringToFront();
+                });
+            };
 
             trayIcon.ShowBalloonTip(time);
         }
@@ -814,6 +816,7 @@ namespace Gallery_dl_UI
         public class MiniForm : Form
         {
             private readonly FlowLayoutPanel FieldPanel;
+            private readonly FlowLayoutPanel _buttonPanel;
 
             public void MiniWindowConfig()
             {
@@ -862,7 +865,15 @@ namespace Gallery_dl_UI
 
                 FieldPanel = fieldPanel;
 
+                _buttonPanel = new FlowLayoutPanel
+                {
+                    Dock = DockStyle.Bottom,
+                    FlowDirection = FlowDirection.RightToLeft,
+                    Height = 40
+                };
+
                 this.Controls.Add(FieldPanel);
+                this.Controls.Add(_buttonPanel);
             }
 
 
@@ -873,6 +884,19 @@ namespace Gallery_dl_UI
                 control.Margin = new Padding(6);
                 FieldPanel.Controls.Add(control);
                 FieldPanel.SetFlowBreak(control, flow);
+            }
+
+            public Button AddButton(string text, Action onClick, bool closeOnClick = true)
+            { 
+                var button = new Button 
+                { 
+                    Text = text, 
+                    AutoSize = true 
+                }; 
+                button.Click += (s, e) => { onClick?.Invoke(); 
+                if (closeOnClick) Close(); }; 
+                _buttonPanel.Controls.Add(button); 
+                return button; 
             }
         }
     }

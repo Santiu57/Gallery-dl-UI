@@ -39,21 +39,21 @@
             dgvLog.AllowUserToOrderColumns = true;
             dgvLog.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dgvLog.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dgvLog.Location = new Point(12, 12);
+            dgvLog.Location = new Point(0, 1);
             dgvLog.Name = "dgvLog";
             dgvLog.ReadOnly = true;
             dgvLog.RowHeadersVisible = false;
             dgvLog.RowHeadersWidth = 51;
             dgvLog.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvLog.Size = new Size(723, 280);
+            dgvLog.Size = new Size(888, 375);
             dgvLog.TabIndex = 4;
             dgvLog.CellMouseClick += dgvLog_CellMouseClick;
             // 
             // btnDeleteLog
             // 
-            btnDeleteLog.Location = new Point(697, 263);
+            btnDeleteLog.Location = new Point(858, 347);
             btnDeleteLog.Name = "btnDeleteLog";
-            btnDeleteLog.Size = new Size(38, 29);
+            btnDeleteLog.Size = new Size(30, 29);
             btnDeleteLog.TabIndex = 5;
             btnDeleteLog.UseVisualStyleBackColor = true;
             btnDeleteLog.Click += btnDeleteLog_Click;
@@ -62,7 +62,7 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(748, 328);
+            ClientSize = new Size(888, 376);
             Controls.Add(btnDeleteLog);
             Controls.Add(dgvLog);
             Name = "LogForm";
