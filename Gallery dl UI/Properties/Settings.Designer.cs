@@ -225,5 +225,17 @@ namespace Gallery_dl_UI.Properties {
                 this["Cookies"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ExtraArgs {
+            get {
+                return ((string)(this["ExtraArgs"]));
+            }
+            set {
+                this["ExtraArgs"] = value;
+            }
+        }
     }
 }

@@ -47,7 +47,7 @@ namespace Gallery_dl_UI
             arg => arg.Command == "-d" || arg.Command == "-D",
             arg =>
             {
-                
+
                 using (FolderBrowserDialog dlg = new FolderBrowserDialog())
                 {
                     if (dlg.ShowDialog() == DialogResult.OK)
@@ -67,36 +67,60 @@ namespace Gallery_dl_UI
                 NameFileMini(arg);
             },
              arg =>
+             {
+                 string safeName = arg.Name.Replace(" ", "");
+                 string panelName = "pnl" + safeName;
+                 string btnName = "btn" + safeName;
+
+                 var panel = this.Controls.Find(panelName, true).FirstOrDefault() as Panel;
+                 var originalBtn = this.Controls.Find(btnName, true).FirstOrDefault() as Button;
+
+                 if (panel != null && originalBtn != null)
+                 {
+                     Button ClearBtn = new Button
+                     {
+                         Width = 30,
+                         Height = 25,
+                         Location = new Point(originalBtn.Left - 35, originalBtn.Top),
+                         BackgroundImage = Image.FromFile("images/clear.png"),
+                         BackgroundImageLayout = ImageLayout.Stretch,
+                         Tag = arg
+                     };
+
+                     ClearBtn.Click += (s, e) =>
+                     {
+                         arg.Value = "";
+                         UpdateArgumentTextBox(this, arg);
+                     };
+
+                     panel.Controls.Add(ClearBtn);
+                     ClearBtn.BringToFront();
+                 }
+             });
+
+            AttachArgumentButtonEvents(
+            this,
+            Image.FromFile("images/plus.png"),
+            arg => arg.Command == "",
+            arg =>
             {
-                string safeName = arg.Name.Replace(" ", "");
-                string panelName = "pnl" + safeName;
-                string btnName = "btn" + safeName;
 
-                var panel = this.Controls.Find(panelName, true).FirstOrDefault() as Panel;
-                var originalBtn = this.Controls.Find(btnName, true).FirstOrDefault() as Button;
+            },
+             arg =>
+             {
+                 string safeName = arg.Name.Replace(" ", "");
+                 string panelName = "pnl" + safeName;
+                 string txbName = "txb" + safeName;
 
-                if (panel != null && originalBtn != null)
-                {
-                    Button ClearBtn = new Button
-                    {
-                        Width = 30,
-                        Height = 25,
-                        Location = new Point(originalBtn.Left - 35, originalBtn.Top),
-                        BackgroundImage = Image.FromFile("images/clear.png"),
-                        BackgroundImageLayout = ImageLayout.Stretch,
-                        Tag = arg
-                    };
+                 var panel = this.Controls.Find(panelName, true).FirstOrDefault() as Panel;
+                 var originaltxb = this.Controls.Find(txbName, true).FirstOrDefault() as TextBox;
 
-                    ClearBtn.Click += (s, e) =>
-                    {
-                        arg.Value = "";
-                        UpdateArgumentTextBox(this, arg);
-                    };
 
-                    panel.Controls.Add(ClearBtn);
-                    ClearBtn.BringToFront();
-                }
-            });
+                 if (panel != null && originaltxb != null)
+                 {
+                     originaltxb.PlaceholderText = "<-Command> <Value>";
+                 }
+             });
 
             AttachArgumentButtonEvents(
             this,
@@ -369,7 +393,8 @@ namespace Gallery_dl_UI
             "-u",
             "-p",
             "-R",
-            "--range"
+            "--range",
+            ""
         };
 
         List<string> SupportedBrowsers = new List<string>

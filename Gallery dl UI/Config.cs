@@ -19,7 +19,7 @@ namespace Gallery_dl_UI
             InitializeComponent();
             this.Icon = MainForm.ConvertImageToIcon("images/icon.png");
             WindowConfig();
-            FontChange();
+            MainForm.FontChange(this);
             MainForm.ColorComponents(this);
         }
 
@@ -128,22 +128,6 @@ namespace Gallery_dl_UI
             }
         }
         private float _currentScale = 1f;
-
-        private void FontChange()
-        {
-            var newFont = Properties.Settings.Default.MainFont;
-
-            float newScale = newFont.Size / this.Font.Size;
-            float deltaScale = newScale / _currentScale;
-
-            this.SuspendLayout();
-
-            this.Font = newFont;
-            this.Scale(new SizeF(deltaScale, deltaScale));
-
-            _currentScale = newScale;
-
-        }
 
         private void btnUpdateGalleryDl_Click(object sender, EventArgs e)
         {

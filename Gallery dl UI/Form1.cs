@@ -309,6 +309,7 @@ namespace Gallery_dl_UI
         Argument UserName = new Argument("Username", Properties.Settings.Default.Username, "-u", "Username for sites that require authentication", Args, true, false);
         Argument Password = new Argument("Password", Properties.Settings.Default.Password, "-p", "Password for sites that require authentication", Args, true, false);
         Argument BrowserCookies = new Argument("Cookies from Browser", Properties.Settings.Default.BrowserCookies, "--cookies-from-browser", "Use cookies from a supported browser to authenticate requests. (e.g. 'edge' or 'firefox')", Args, true, true);
+        Argument ExtraArgs = new Argument("Extra Arguments", Properties.Settings.Default.ExtraArgs, "", "Any additional arguments you want to add to the command. Make sure to use the correct syntax", Args, true, false);
 
 
 
