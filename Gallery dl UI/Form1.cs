@@ -409,6 +409,14 @@ namespace Gallery_dl_UI
 
                 if (ValidUrl(contenido) && !RepetedUrl(contenido))
                 {
+                    foreach (var filter in UrlsFilters)
+                    {
+                        if (filter.Condition(contenido))
+                        {
+                            contenido = filter.Action(contenido);
+                        }
+                    }
+
                     AddUrlToDGV(contenido);
 
                     int count = UrlCount();
@@ -422,6 +430,25 @@ namespace Gallery_dl_UI
         }
 
         string Status = "Idle";
+
+        //Urls filter
+
+        public static List<UrlFilter> UrlsFilters = new List<UrlFilter>();
+        public class UrlFilter
+        {
+            public Func<string, bool> Condition { get; set; }
+            public Func<string, string> Action { get; set; }
+
+            public UrlFilter(Func<string, bool> condition, Func<string, string> action, List<UrlFilter> container)
+            {
+                Condition = condition;
+                Action = action;
+                container.Add(this);
+            }
+        }
+
+        UrlFilter CunnyX = new UrlFilter(url => ExtractSiteName(url) == "cunnyx", url => url.Replace("cunnyx", "x"), UrlsFilters);
+
         //Notification
 
         public static void NotificationShow(string title, string desc, bool playsound = true)
