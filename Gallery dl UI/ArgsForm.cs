@@ -79,9 +79,9 @@ namespace Gallery_dl_UI
                  {
                      Button ClearBtn = new Button
                      {
-                         Width = 30,
-                         Height = 25,
-                         Location = new Point(originalBtn.Left - 35, originalBtn.Top),
+                         Width = 18,
+                         Height = 15,
+                         Location = new Point(originalBtn.Left - 25, originalBtn.Top),
                          BackgroundImage = Image.FromFile("images/clear.png"),
                          BackgroundImageLayout = ImageLayout.Stretch,
                          Tag = arg
@@ -158,11 +158,11 @@ namespace Gallery_dl_UI
             int total = visibleArgs.Count;
             int rowsPerColumn = (int)Math.Ceiling(total / 2.0);
 
-            int panelWidth = (container.Width / 2) - 20;
-            int panelHeight = 85;
-            int verticalSpacing = 95;
-            int leftMargin = 10;
-            int rightMargin = container.Width / 2 + 10;
+            int panelWidth = (container.Width / 2) - 12;  // antes -20
+            int panelHeight = 51;                         // antes 85
+            int verticalSpacing = 57;                     // antes 95
+            int leftMargin = 6;                           // antes 10
+            int rightMargin = container.Width / 2 + 6;    // antes +10
 
             for (int i = 0; i < total; i++)
             {
@@ -173,7 +173,7 @@ namespace Gallery_dl_UI
                 int row = i % rowsPerColumn;
 
                 int x = column == 0 ? leftMargin : rightMargin;
-                int y = 10 + row * verticalSpacing;
+                int y = (int)(10)+ row * verticalSpacing;
 
                 Panel pnl = new Panel
                 {
@@ -191,31 +191,27 @@ namespace Gallery_dl_UI
                     Text = arg.Name,
                     Checked = arg.Enabled,
                     AutoSize = true,
-                    Location = new Point(10, 10),
+                    Location = new Point(6, 6),  // antes (10,10)
                     Name = "chk" + safeName
                 };
-                tooltip.SetToolTip(chk, arg.Description);
 
                 Button btn = new Button
                 {
-                    Text = "...",
-                    Width = 30,
-                    Height = 25,
-                    Location = new Point(panelWidth - 40, 8),
+                    Width = 18,     // antes 30
+                    Height = 15,    // antes 25
+                    Location = new Point(panelWidth - 24, 5), // antes -40 , 8
                     Name = "btn" + safeName,
                     Tag = arg
                 };
-                tooltip.SetToolTip(btn, arg.Description);
 
                 TextBox txb = new TextBox
                 {
-                    Width = panelWidth - 20,
-                    Location = new Point(10, 45),
+                    Width = panelWidth - 12, // antes -20
+                    Location = new Point(6, 27), // antes (10,45)
                     Name = "txb" + safeName,
                     Text = arg.Value,
-                    PlaceholderText = $"<value>"
+                    PlaceholderText = "<value>"
                 };
-                tooltip.SetToolTip(txb, arg.Description);
 
                 chk.CheckedChanged += (s, e) =>
                 {

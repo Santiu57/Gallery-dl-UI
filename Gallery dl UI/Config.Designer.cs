@@ -219,9 +219,9 @@
             // 
             // btnNotifications
             // 
-            btnNotifications.Location = new Point(168, 161);
+            btnNotifications.Location = new Point(168, 165);
             btnNotifications.Name = "btnNotifications";
-            btnNotifications.Size = new Size(31, 37);
+            btnNotifications.Size = new Size(31, 27);
             btnNotifications.TabIndex = 16;
             btnNotifications.Text = "+";
             btnNotifications.TextAlign = ContentAlignment.TopCenter;

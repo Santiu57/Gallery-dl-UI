@@ -127,7 +127,6 @@ namespace Gallery_dl_UI
                 lblFontPreview.Font = fdLetteres.Font;
             }
         }
-        private float _currentScale = 1f;
 
         private void btnUpdateGalleryDl_Click(object sender, EventArgs e)
         {
@@ -259,6 +258,23 @@ namespace Gallery_dl_UI
 
             mini.AddControl(row);
 
+            if (!Properties.Settings.Default.ShowNotifs)
+            {
+                mini.AddButton("Turn on all notifs", () => 
+                {
+                    Properties.Settings.Default.ShowNotifs = true;
+                    Properties.Settings.Default.Save();
+                });
+            }
+            else
+            {
+                mini.AddButton("Turn off all notifs", () =>
+                {
+                    Properties.Settings.Default.ShowNotifs = false;
+                    Properties.Settings.Default.Save();
+                });
+            }
+
             mini.FormClosing += (s, e) =>
             {
                 Properties.Settings.Default.NotificationPerLink = (int)numeric.Value;
@@ -268,7 +284,6 @@ namespace Gallery_dl_UI
             mini.FontAndColorMini();
             mini.MiniWindowConfig();
 
-            mini.MaximumSize = new Size(mini.Width, 200);
             mini.ShowDialog();
         }
     }

@@ -1,3 +1,4 @@
+using Gallery_dl_UI.Properties;
 using Microsoft.Toolkit.Uwp.Notifications;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -59,7 +60,6 @@ namespace Gallery_dl_UI
         private void tsbtnConfig_Click(object sender, EventArgs e)
         {
             Config config = new Config();
-            _currentScale = 1f;
             config.ShowDialog();
             ColorComponents(this);
             if (btnStartdownload.Font != Properties.Settings.Default.MainFont)
@@ -426,6 +426,8 @@ namespace Gallery_dl_UI
 
         public static void NotificationShow(string title, string desc, bool playsound = true)
         {
+            if(!Properties.Settings.Default.ShowNotifs)
+                return;
             try
             {
                 var builder = new ToastContentBuilder()
@@ -517,12 +519,11 @@ namespace Gallery_dl_UI
             }
         }
 
-        public static float _currentScale = 1f;
-
         public static void FontChange(Control form)
         {
-            if(Properties.Settings.Default.MainFont == null)
+            if (Properties.Settings.Default.MainFont == null)
                 return;
+
             TraverseAllControls(form, control =>
             {
                 control.Font = null;
@@ -530,16 +531,14 @@ namespace Gallery_dl_UI
 
             var newFont = Properties.Settings.Default.MainFont;
 
-            float newScale = newFont.Size / form.Font.Size;
-            float deltaScale = newScale / MainForm._currentScale;
+            float scale = newFont.Size / form.Font.Size;
 
             form.SuspendLayout();
 
             form.Font = newFont;
-            form.Scale(new SizeF(deltaScale, deltaScale));
+            form.Scale(new SizeF(scale, scale));
 
-            _currentScale = newScale;
-
+            form.ResumeLayout();
         }
         private void ForceRefresh(Control parent)
         {

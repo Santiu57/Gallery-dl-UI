@@ -37,7 +37,7 @@
             AutoSize = true;
             ClientSize = new Size(478, 272);
             Name = "ArgsForm";
-            Text = "ArgsForm";
+            Text = "Arguments";
             FormClosing += ArgsForm_FormClosing;
             Load += ArgsForm_Load;
             ResumeLayout(false);

@@ -237,5 +237,17 @@ namespace Gallery_dl_UI.Properties {
                 this["ExtraArgs"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShowNotifs {
+            get {
+                return ((bool)(this["ShowNotifs"]));
+            }
+            set {
+                this["ShowNotifs"] = value;
+            }
+        }
     }
 }
