@@ -1,3 +1,4 @@
+using Microsoft.Toolkit.Uwp.Notifications;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -51,7 +52,7 @@ namespace Gallery_dl_UI
 
             Urls = UrlExtractor(dgvUrlsFusion());
 
-            NotificationShow("Operacion Iniciada", Urls.Count.ToString() + " Urls a descargar", 1000);
+            NotificationShow("Operacion Iniciada", Urls.Count.ToString() + " Urls a descargar");
 
             await LinksQueue();
         }
@@ -194,7 +195,7 @@ namespace Gallery_dl_UI
             if (!Errors())
             {
                 Urls.Clear();
-                NotificationShow("Completado", "Operación realizada con exito", 600);
+                NotificationShow("Completado", "Operación realizada con exito");
             }
             ChangeStatusLabel("sleeping...");
             ChangeProgresBar(0);
@@ -399,33 +400,36 @@ namespace Gallery_dl_UI
                     int count = UrlCount();
                     if(Properties.Settings.Default.NotificationPerLink != -1 && Properties.Settings.Default.NotificationPerLink > 0 && count % Properties.Settings.Default.NotificationPerLink == 0)
                     {
-                        NotificationShow("La URL fue copiada correctamente.", "Has añadido " + count + " Urls", 500);
+                        NotificationShow("La URL fue copiada correctamente.", "Has añadido " + count + " Urls");
                     }
                     CurrentUrlsUpd();
                 }
             }
         }
         //Notification
-        NotifyIcon trayIcon = new NotifyIcon();
 
-        private void NotificationShow(string Title, string Text, int time)
+        public static void NotificationShow(string title, string desc, bool playsound = true)
         {
-            trayIcon.Icon = new System.Drawing.Icon("images/icon.ico");
-            trayIcon.Visible = true;
-            trayIcon.BalloonTipTitle = Title;
-            trayIcon.BalloonTipText = Text;
-            trayIcon.BalloonTipIcon = ToolTipIcon.Info;
-            trayIcon.BalloonTipClicked += (s, e) =>
+            try
             {
-                this.Invoke((MethodInvoker)delegate
+                var builder = new ToastContentBuilder()
+                    .AddText(title)
+                    .AddText(desc);
+                builder.AddAppLogoOverride(new Uri(Path.Combine(Environment.CurrentDirectory, "images/icon.png")), ToastGenericAppLogoCrop.Default);
+                if (!playsound)
                 {
-                    this.WindowState = FormWindowState.Normal;
-                    this.Show();
-                    this.BringToFront();
-                });
-            };
-
-            trayIcon.ShowBalloonTip(time);
+                    builder.AddAudio(null);
+                }
+                else
+                {
+                    builder.AddAudio(new Uri("ms-winsoundevent:Notification.Default"));
+                }
+                builder.Show();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error showing notification:\n{ex.Message}", "Notification Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         //UI
@@ -501,6 +505,8 @@ namespace Gallery_dl_UI
 
         public static void FontChange(Control form)
         {
+            if(Properties.Settings.Default.MainFont == null)
+                return;
             TraverseAllControls(form, control =>
             {
                 control.Font = null;
@@ -713,7 +719,7 @@ namespace Gallery_dl_UI
             try
             {
                 string[] errorLines = File.ReadAllLines(errorLogPath);
-                NotificationShow("Error Detectado", errorLines.Length.ToString() + " Urls", 5000);
+                NotificationShow("Error Detectado", errorLines.Length.ToString() + " Urls");
                 foreach (string UrlError in errorLines)
                 {
                     AddUrlToDGV(UrlError);
