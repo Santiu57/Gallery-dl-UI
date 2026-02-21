@@ -66,11 +66,13 @@
             // nudSimultaneousDownloads
             // 
             nudSimultaneousDownloads.Location = new Point(326, 7);
-            nudSimultaneousDownloads.Maximum = new decimal(new int[] { 5, 0, 0, 0 });
+            nudSimultaneousDownloads.Maximum = new decimal(new int[] { 25, 0, 0, 0 });
+            nudSimultaneousDownloads.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             nudSimultaneousDownloads.Name = "nudSimultaneousDownloads";
             nudSimultaneousDownloads.Size = new Size(59, 35);
             nudSimultaneousDownloads.TabIndex = 1;
             tp.SetToolTip(nudSimultaneousDownloads, "Simultaneous gallery dl instances that will be open ");
+            nudSimultaneousDownloads.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
             // btnSave
             // 

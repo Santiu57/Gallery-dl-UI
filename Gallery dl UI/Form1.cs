@@ -168,6 +168,7 @@ namespace Gallery_dl_UI
             int total = Urls.Count;
 
             ChangeStatusLabel($"{0}/{total} Completadas");
+            Status = "Downloading";
 
             var tasks = Urls.Select(async url =>
             {
@@ -198,6 +199,7 @@ namespace Gallery_dl_UI
                 NotificationShow("Completado", "Operación realizada con exito");
             }
             ChangeStatusLabel("sleeping...");
+            Status = "Idle";
             ChangeProgresBar(0);
         }
 
@@ -237,7 +239,14 @@ namespace Gallery_dl_UI
                 Argument arg = null;
                 var directoryArgs = Args.Where(a => a.Command == "-D" || a.Command == "-d").ToList();
                 var activeArgs = Args.Where(a => a.Enabled).ToList();
-                arg = activeArgs[0]; 
+                if(activeArgs.Count == 1)
+                {
+                    arg = activeArgs[1];
+                }
+                else if (activeArgs.Count == 0)
+                {
+                    arg = activeArgs[0];
+                }
                 return arg;
             }
             public void AddToSaveFile()
@@ -389,6 +398,11 @@ namespace Gallery_dl_UI
         //Clipboard detector
         private void sharpClipboard1_ClipboardChanged(object sender, WK.Libraries.SharpClipboardNS.SharpClipboard.ClipboardChangedEventArgs e)
         {
+            if (Status == "Downloading")
+            {
+                NotificationShow("Operacion en curso", "Espera a que termine la descarga para añadir nuevas Urls");
+                return;
+            }  
             if (e.ContentType == SharpClipboard.ContentTypes.Text)
             {
                 string contenido = e.Content.ToString().Trim();
@@ -406,6 +420,8 @@ namespace Gallery_dl_UI
                 }
             }
         }
+
+        string Status = "Idle";
         //Notification
 
         public static void NotificationShow(string title, string desc, bool playsound = true)
