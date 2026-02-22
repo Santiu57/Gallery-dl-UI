@@ -1,6 +1,7 @@
 using Gallery_dl_UI.Properties;
 using Microsoft.Toolkit.Uwp.Notifications;
 using System.Diagnostics;
+using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Policy;
@@ -53,7 +54,7 @@ namespace Gallery_dl_UI
 
             Urls = UrlExtractor(dgvUrlsFusion());
 
-            NotificationShow("Operacion Iniciada", Urls.Count.ToString() + " Urls a descargar");
+            NotificationShow(Lang.OperationInit, $"{Urls.Count.ToString()} {Lang.UrlsToDownload}");
 
             await LinksQueue();
         }
@@ -167,7 +168,7 @@ namespace Gallery_dl_UI
             int completed = 0;
             int total = Urls.Count;
 
-            ChangeStatusLabel($"{0}/{total} Completadas");
+            ChangeStatusLabel($"{0}/{total} {Lang.Completed}");
             Status = "Downloading";
 
             var tasks = Urls.Select(async url =>
@@ -178,7 +179,7 @@ namespace Gallery_dl_UI
 
                 Invoke(() =>
                 {
-                    ChangeStatusLabel($"{done}/{total} Completadas");
+                    ChangeStatusLabel($"{done}/{total} {Lang.Completed}");
                     SaveLog(url);
                     RowChangeProgresBar(done, total);
                 });
@@ -196,9 +197,9 @@ namespace Gallery_dl_UI
             if (!Errors())
             {
                 Urls.Clear();
-                NotificationShow("Completado", "Operación realizada con exito");
+                NotificationShow(Lang.Completed, Lang.OperationCompleted);
             }
-            ChangeStatusLabel("sleeping...");
+            ChangeStatusLabel(Lang.Sleeping);
             Status = "Idle";
             ChangeProgresBar(0);
         }
@@ -400,7 +401,7 @@ namespace Gallery_dl_UI
         {
             if (Status == "Downloading")
             {
-                NotificationShow("Operacion en curso", "Espera a que termine la descarga para añadir nuevas Urls");
+                NotificationShow(Lang.OperationInProgress, Lang.WaitForFinish);
                 return;
             }  
             if (e.ContentType == SharpClipboard.ContentTypes.Text)
@@ -422,7 +423,7 @@ namespace Gallery_dl_UI
                     int count = UrlCount();
                     if(Properties.Settings.Default.NotificationPerLink != -1 && Properties.Settings.Default.NotificationPerLink > 0 && count % Properties.Settings.Default.NotificationPerLink == 0)
                     {
-                        NotificationShow("La URL fue copiada correctamente.", "Has añadido " + count + " Urls");
+                        NotificationShow(Lang.UrlCopied, string.Format(Lang.UrlsAdded, count));
                     }
                     CurrentUrlsUpd();
                 }
@@ -585,13 +586,6 @@ namespace Gallery_dl_UI
                     ts.PerformLayout();
                     ts.ResumeLayout();
                 }
-                if (control is Button btn)
-                {
-                    if (btn.Name == "btnStartdownload")
-                    {
-
-                    }
-                }
 
                 if (control.HasChildren)
                     ForceRefresh(control);
@@ -729,12 +723,12 @@ namespace Gallery_dl_UI
                 }
                 else
                 {
-                    MessageBox.Show("La URL no es válida.");
+                    MessageBox.Show("Invalid URL");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("No se pudo abrir el enlace.\n" + ex.Message);
+                MessageBox.Show("Couldn't open the URL.\n" + ex.Message);
             }
         }
 
@@ -761,7 +755,7 @@ namespace Gallery_dl_UI
             try
             {
                 string[] errorLines = File.ReadAllLines(errorLogPath);
-                NotificationShow("Error Detectado", errorLines.Length.ToString() + " Urls");
+                NotificationShow(Lang.ThereWereErrors, string.Format(Lang.UrlsWithErrors, errorLines.Length.ToString()));
                 foreach (string UrlError in errorLines)
                 {
                     AddUrlToDGV(UrlError);
@@ -771,7 +765,7 @@ namespace Gallery_dl_UI
                             PixivTokenMissing();
                             break;
                         case "x":
-                            MessageBox.Show("Twitter ha cambiado su sistema de autenticación, es necesario añadir las cookies de tu navegador para seguir descargando de esta plataforma", "Twitter Error");
+                            MessageBox.Show(Lang.TwitterError, "Twitter Error");
                             break;
                     }
                 }
@@ -781,19 +775,19 @@ namespace Gallery_dl_UI
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error al leer el archivo: " + ex.Message);
+                MessageBox.Show("Error reading the error log: \n" + ex.Message);
                 return true;
             }
         }
 
         private void PixivTokenMissing()
         {
-            MessageBox.Show("Comprueba o añade tu refresh-token de Pixiv, \nSigue las instrucciones del CMD", "Pixiv Error");
+            MessageBox.Show(Lang.PixivError, "Pixiv Error");
             var startInfo = new ProcessStartInfo()
             {
                 FileName = "gallery-dl",
                 Arguments = "oauth:pixiv",
-                UseShellExecute = false,
+                UseShellExecute = true,
                 CreateNoWindow = false
             };
             
@@ -873,16 +867,16 @@ namespace Gallery_dl_UI
                 if (installed < latest)
                 {
                     MessageBox.Show(
-                        $"Nueva versión disponible.\n\nInstalada: {installed}\nÚltima: {latest}",
-                        "Actualización disponible",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Information
-                    );
+                    string.Format(Lang.NewVersionAvailable, installed, latest),
+                    Lang.GalleryDlUpdateTitle,
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
                 }
             }
             catch
             {
-                // Opcional: manejar errores silenciosamente
+
             }
         }
         private void tsbtnLog_Click(object sender, EventArgs e)
