@@ -238,15 +238,17 @@ namespace Gallery_dl_UI
             public Argument DirectoryArgsFilter()
             {
                 Argument arg = null;
-                var directoryArgs = Args.Where(a => a.Command == "-D" || a.Command == "-d").ToList();
-                var activeArgs = Args.Where(a => a.Enabled).ToList();
-                if(activeArgs.Count == 1)
+                bool hasDirectoryArg = Args.Any(a => (a.Command == "-D" || a.Command == "-d") && a.Enabled);
+                if(hasDirectoryArg)
                 {
-                    arg = activeArgs[1];
-                }
-                else if (activeArgs.Count == 0)
-                {
-                    arg = activeArgs[0];
+                    if(Args.Any(a => a.Command == "-D" && a.Enabled))
+                    {
+                        arg = Args.First(a => a.Command == "-D" && a.Enabled);
+                    }
+                    else
+                    {
+                        arg = Args.First(a => a.Command == "-d" && a.Enabled);
+                    }
                 }
                 return arg;
             }

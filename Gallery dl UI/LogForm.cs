@@ -120,7 +120,11 @@ namespace Gallery_dl_UI
         private void btnDeleteLog_Click(object sender, EventArgs e)
         {
             File.Delete("log.json");
-            LoadLog(dgvLog);
+        }
+
+        private void LogForm_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

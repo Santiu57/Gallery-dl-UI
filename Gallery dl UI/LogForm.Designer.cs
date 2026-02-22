@@ -67,6 +67,7 @@
             Controls.Add(dgvLog);
             Name = "LogForm";
             Text = "LogForm";
+            Load += LogForm_Load;
             ((System.ComponentModel.ISupportInitialize)dgvLog).EndInit();
             ResumeLayout(false);
         }

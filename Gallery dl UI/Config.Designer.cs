@@ -59,7 +59,7 @@
             label1.Name = "label1";
             label1.Size = new Size(292, 27);
             label1.TabIndex = 0;
-            label1.Text = "Descargas Simultaneas";
+            label1.Text = "Simultaneous Downloads";
             tp.SetToolTip(label1, "Simultaneous gallery dl instances that will be open ");
             label1.Click += label1_Click;
             // 
@@ -92,7 +92,7 @@
             label2.Name = "label2";
             label2.Size = new Size(292, 36);
             label2.TabIndex = 3;
-            label2.Text = "Color de Fondo ";
+            label2.Text = "Main Back color";
             tp.SetToolTip(label2, "Main Back color of the App");
             // 
             // label3
@@ -102,7 +102,7 @@
             label3.Name = "label3";
             label3.Size = new Size(292, 39);
             label3.TabIndex = 4;
-            label3.Text = "Color de Letra";
+            label3.Text = "Main Fore color";
             tp.SetToolTip(label3, "Main Fore color of the App");
             // 
             // btnChangeBackColor
@@ -172,7 +172,7 @@
             label4.Name = "label4";
             label4.Size = new Size(292, 39);
             label4.TabIndex = 10;
-            label4.Text = "Tipografia";
+            label4.Text = "Font";
             tp.SetToolTip(label4, "Main Font and size of the App");
             // 
             // lblFontPreview
@@ -214,7 +214,7 @@
             label5.Name = "label5";
             label5.Size = new Size(185, 27);
             label5.TabIndex = 15;
-            label5.Text = "Notificaciones";
+            label5.Text = "Notifications";
             tp.SetToolTip(label5, "How many notifications show when copying");
             // 
             // btnNotifications
