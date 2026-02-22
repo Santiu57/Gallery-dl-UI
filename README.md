@@ -8,7 +8,7 @@ All configurations of the App:
 
 <img width="452" height="323" alt="image" src="https://github.com/user-attachments/assets/7d76494a-ba6f-47b2-a2af-80e86cbb613c" />
 
-Main Window:
+**Main Window:**
 
 <img width="390" height="297" alt="image" src="https://github.com/user-attachments/assets/59c801aa-55fb-42d8-8a98-02913f6223e8" />
 
@@ -22,7 +22,7 @@ Right clicking any URL will delete the clicked URL
 
 Left clicking any URL will open the clicked URL
 
-Arguments:
+**Arguments:**
 
 <img width="750" height="483" alt="image" src="https://github.com/user-attachments/assets/a7d8e493-d355-46a8-975c-4d12c68d3a76" />
 
@@ -51,7 +51,7 @@ Is recommended to extract cookies with an [extension](https://chromewebstore.goo
     },
 ```
 
-Log:
+**Log:**
 
 <img width="1064" height="488" alt="image" src="https://github.com/user-attachments/assets/c567212a-dee7-4d80-956f-e90c5e51322a" />
 
@@ -61,7 +61,7 @@ Clicking the path will open it in the file explorer
 
 Clicking the URL will open in your browser
 
-Recomendations:
+**Recomendations:**
 
 Change the main Font, the windows scales by the font size so if you want them bigger change the font to bigger number and so on.
 
@@ -71,7 +71,7 @@ If any download gets an error first verify that is a supported URL (When copying
 
 [Install pip](https://pypi.org/project/pip/)
 
-Aditional Info:
+**Aditional Info:**
 
 You can add multiple Arguments into the extra Argument zone <-Arg1> <value1> <-Arg2> <value2>. just ensure to leave a blank space between values
 
