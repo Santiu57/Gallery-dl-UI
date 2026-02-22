@@ -28,7 +28,7 @@ Arguments:
 
 
 Check [Gallery dl options](https://github.com/mikf/gallery-dl/blob/master/docs/options.md) for more information and commands, 
-hovering the mouse over an argument will show a brief description an even an example
+hovering the mouse over an argument will show a brief description and even an example
 
 Enable or disable the arguments you want to Add, only enabled ones will be used in the downloads and will be manipulable, 
 if you can't modify the value, first verify that you have it enabled
@@ -55,7 +55,11 @@ Log:
 
 <img width="1064" height="488" alt="image" src="https://github.com/user-attachments/assets/c567212a-dee7-4d80-956f-e90c5e51322a" />
 
-The App saves what URLs you have downloaded, it doesn't do anything with it so you can always delete it with the trash button, reopen the Logform to see that everithing is deleted
+The App saves what URLs you have downloaded, it doesn't do anything with it so you can always delete it with the trash button, reopen the Logform to see that everything is deleted
+
+Clicking the path will open it in the file explorer
+
+Clicking the URL will open in your browser
 
 Recomendations:
 
