@@ -25,7 +25,6 @@ namespace Gallery_dl_UI
             FontChange(this);
             ForceRefresh(this);
             LoadArguments();
-            CheckGalleryDlUpdate();
         }
 
         public static void TraverseAllControls(Control parent, Action<Control> action)
@@ -39,7 +38,7 @@ namespace Gallery_dl_UI
         }
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            CheckGalleryDlUpdate();
         }
 
         //Buttons
