@@ -450,6 +450,7 @@ namespace Gallery_dl_UI
         }
 
         UrlFilter CunnyX = new UrlFilter(url => ExtractSiteName(url) == "cunnyx", url => url.Replace("cunnyx", "x"), UrlsFilters);
+        UrlFilter SkibidiX = new UrlFilter(url => ExtractSiteName(url) == "skibidix", url => url.Replace("skibidix", "x"), UrlsFilters);
 
         //Notification
 
