@@ -74,3 +74,5 @@ You can add multiple Arguments into the extra Argument zone <-Arg1> <value1> <-A
 There is currently 1 filter that is with "cunnyx" for discord, it just removes the "cuuny" to leave with a "X" URL. CunnyX URLs will throw an error
 
 The App checks for Gallery-Dl updates when launched using pip
+
+You can change the images to whatever you want, just keep the names intact or the App wont open or will crash
