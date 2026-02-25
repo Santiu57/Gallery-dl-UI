@@ -123,9 +123,6 @@
   <data name="GalleryDlUpdateTitle" xml:space="preserve">
     <value>gallery-dl Update</value>
   </data>
-  <data name="NewVersionAvailable" xml:space="preserve">
-    <value>A new version of gallery-dl is available.\n\nInstalled version: {0}\nLatest version: {1}</value>
-  </data>
   <data name="OperationCompleted" xml:space="preserve">
     <value>Operation successfully completed</value>
   </data>
@@ -145,7 +142,7 @@
     <value>There Were Errors</value>
   </data>
   <data name="TwitterError" xml:space="preserve">
-    <value>Twitter has changed its authentication system, you now need to add your acount to continue downloading from this platform.</value>
+    <value>Check your Cookies or the URL</value>
   </data>
   <data name="UrlCopied" xml:space="preserve">
     <value>URL copied correctly</value>

@@ -70,35 +70,27 @@ namespace Gallery_dl_UI
         private void btnClear_Click(object sender, EventArgs e)
         {
             dgvUrls.Rows.Clear();
+            CurrentUrlsUpd();
         }
         // GalleryDl Manager
         List<string> Urls = new List<string>();
         private SemaphoreSlim _semaphore;
 
-        private async Task RunGalleryDl(string url)
+        public static async Task RunGalleryDl(string url, string arguments)
         {
-            await _semaphore.WaitAsync();
-
-            try
+            var startInfo = new ProcessStartInfo()
             {
-                var startInfo = new ProcessStartInfo()
-                {
-                    FileName = "gallery-dl",
-                    Arguments = Arguments + url,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
+                FileName = "gallery-dl",
+                Arguments = arguments + url,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
 
-                using (var process = new Process())
-                {
-                    process.StartInfo = startInfo;
-                    process.Start();
-                    await process.WaitForExitAsync();
-                }
-            }
-            finally
+            using (var process = new Process())
             {
-                _semaphore.Release();
+                process.StartInfo = startInfo;
+                process.Start();
+                await process.WaitForExitAsync();
             }
         }
 
@@ -172,17 +164,41 @@ namespace Gallery_dl_UI
 
             var tasks = Urls.Select(async url =>
             {
-                await RunGalleryDl(url);
-
-                int done = Interlocked.Increment(ref completed);
-
-                Invoke(() =>
+                await _semaphore.WaitAsync(); // GLOBAL
+                try
                 {
-                    ChangeStatusLabel($"{done}/{total} {Lang.Completed}");
-                    SaveLog(url);
-                    RowChangeProgresBar(done, total);
-                });
+                    string site = ExtractSiteName(url);
 
+                    bool handled = false;
+
+                    foreach (var api in ApiSites)
+                    {
+                        if (api.Condition(site))
+                        {
+                            await api.ExecuteAsync(url, Arguments);
+                            handled = true;
+                            break;
+                        }
+                    }
+
+                    if (!handled)
+                    {
+                        await RunGalleryDl(url, Arguments);
+                    }
+
+                    int done = Interlocked.Increment(ref completed);
+
+                    Invoke(() =>
+                    {
+                        ChangeStatusLabel($"{done}/{total} {Lang.Completed}");
+                        SaveLog(url);
+                        RowChangeProgresBar(done, total);
+                    });
+                }
+                finally
+                {
+                    _semaphore.Release(); // GLOBAL RELEASE
+                }
             }).ToList();
 
             await Task.WhenAll(tasks);
@@ -201,6 +217,31 @@ namespace Gallery_dl_UI
             ChangeStatusLabel(Lang.Sleeping);
             Status = "Idle";
             ChangeProgresBar(0);
+        }
+
+        public void AddUrl(string urls)
+        {
+            foreach (string url in UrlExtractor(urls))
+            {
+                string extractedUrl = url;
+                if (!RepetedUrl(extractedUrl))
+                {
+                    foreach (var filter in UrlsFilters)
+                    {
+                        if (filter.Condition(extractedUrl))
+                        {
+                            extractedUrl = filter.Action(extractedUrl);
+                        }
+                    }
+                    AddUrlToDGV(extractedUrl);
+                    int count = UrlCount();
+                    if (Properties.Settings.Default.NotificationPerLink != -1 && Properties.Settings.Default.NotificationPerLink > 0 && count % Properties.Settings.Default.NotificationPerLink == 0)
+                    {
+                        NotificationShow(Lang.UrlCopied, string.Format(Lang.UrlsAdded, count));
+                    }
+                    CurrentUrlsUpd();
+                }
+            }
         }
 
         //Log
@@ -312,8 +353,8 @@ namespace Gallery_dl_UI
         Argument DestinationPATH = new Argument("Destination Path", Properties.Settings.Default.DestinationPath, "-d", "Target location for file downloads. Files will be distribute in the selected folder", Args, true);
         Argument DirectoryPATH = new Argument("Download Path", Properties.Settings.Default.DirectoryPath, "-D", "Exact location for file downloads. All files will go to selected folder", Args, true, false);
         Argument FileName = new Argument("File Name", Properties.Settings.Default.FileName, "-f", "Files naming structure", Args, true, false);
-        Argument NoOverwrites = new Argument("No overwrites", " ", "--no-overwrites", "Skip files that already exist", Args, false);
-        Argument NoProgress = new Argument("No Progress", " ", "--no-progress", "Removes console progress", Args, false);
+        Argument NoOverwrites = new Argument("No overwrites", "--no-overwrites", "", "Skip files that already exist", Args, false);
+        Argument NoProgress = new Argument("No Progress", "--no-progress", " ", "Removes console progress", Args, false);
         Argument ErrorLog = new Argument("Error Log", Properties.Settings.Default.ErrorLog, "-e", "Path to save error logs", Args, false);
         Argument Retries = new Argument("Retries", Properties.Settings.Default.Retries, "-R", "Maximum number of retries for failed HTTP requests. -1 for infinite retries", Args, true);
         Argument Sleep = new Argument("Sleep", Properties.Settings.Default.Sleep, "--sleep", " Number of seconds to wait before each download. This can be either a constant value or a range (e.g. 2.7 or 2.0-3.5)", Args, true, false);
@@ -400,35 +441,13 @@ namespace Gallery_dl_UI
         //Clipboard detector
         private void sharpClipboard1_ClipboardChanged(object sender, WK.Libraries.SharpClipboardNS.SharpClipboard.ClipboardChangedEventArgs e)
         {
+            string contenido = e.Content.ToString().Trim();
             if (Status == "Downloading")
             {
                 NotificationShow(Lang.OperationInProgress, Lang.WaitForFinish);
                 return;
-            }  
-            if (e.ContentType == SharpClipboard.ContentTypes.Text)
-            {
-                string contenido = e.Content.ToString().Trim();
-
-                if (ValidUrl(contenido) && !RepetedUrl(contenido))
-                {
-                    foreach (var filter in UrlsFilters)
-                    {
-                        if (filter.Condition(contenido))
-                        {
-                            contenido = filter.Action(contenido);
-                        }
-                    }
-
-                    AddUrlToDGV(contenido);
-
-                    int count = UrlCount();
-                    if(Properties.Settings.Default.NotificationPerLink != -1 && Properties.Settings.Default.NotificationPerLink > 0 && count % Properties.Settings.Default.NotificationPerLink == 0)
-                    {
-                        NotificationShow(Lang.UrlCopied, string.Format(Lang.UrlsAdded, count));
-                    }
-                    CurrentUrlsUpd();
-                }
             }
+            AddUrl(contenido);
         }
 
         string Status = "Idle";
@@ -451,6 +470,38 @@ namespace Gallery_dl_UI
 
         UrlFilter CunnyX = new UrlFilter(url => ExtractSiteName(url) == "cunnyx", url => url.Replace("cunnyx", "x"), UrlsFilters);
         UrlFilter SkibidiX = new UrlFilter(url => ExtractSiteName(url) == "skibidix", url => url.Replace("skibidix", "x"), UrlsFilters);
+
+
+        //Sites to have just one instance at the same time
+        public static List<ApiSite> ApiSites = new List<ApiSite>();
+        public class ApiSite
+        {
+            public string Site { get; }
+            public Func<string, bool> Condition => site => site == Site;
+
+            private readonly SemaphoreSlim _Apisemaphore = new(1, 1);
+
+            public ApiSite(string site, List<ApiSite> container)
+            {
+                Site = site;
+                container.Add(this);
+            }
+
+            public async Task ExecuteAsync(string url, string Arguments)
+            {
+                await _Apisemaphore.WaitAsync();
+                try
+                {
+                    await RunGalleryDl(url, Arguments); 
+                }
+                finally
+                {
+                    _Apisemaphore.Release();
+                }
+            }
+        }
+
+        ApiSite Gelbooru = new ApiSite("gelbooru", ApiSites);
 
         //Notification
 
@@ -738,13 +789,7 @@ namespace Gallery_dl_UI
         //TXB
         private void txbAddUrl_TextChanged(object sender, EventArgs e)
         {
-            foreach (string url in UrlExtractor(txbAddUrl.Text))
-            {
-                if (!RepetedUrl(url))
-                {
-                    AddUrlToDGV(url);
-                }
-            }
+            AddUrl(txbAddUrl.Text);
             txbAddUrl.Clear();
         }
 
@@ -767,7 +812,7 @@ namespace Gallery_dl_UI
                             PixivTokenMissing();
                             break;
                         case "x":
-                            MessageBox.Show(Lang.TwitterError, "Twitter Error");
+                            NotificationShow(Lang.TwitterError, "Twitter Error");
                             break;
                     }
                 }
@@ -868,11 +913,9 @@ namespace Gallery_dl_UI
 
                 if (installed < latest)
                 {
-                    MessageBox.Show(
-                    string.Format(Lang.NewVersionAvailable, installed, latest),
+                    NotificationShow(
                     Lang.GalleryDlUpdateTitle,
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information
+                    string.Format($"A new version of gallery-dl is available. \n Installed version: {installed} \n Latest version: {latest}")
                 );
                 }
             }

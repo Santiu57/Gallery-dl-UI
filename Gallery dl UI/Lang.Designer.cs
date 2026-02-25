@@ -79,15 +79,6 @@ namespace Gallery_dl_UI {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a A new version of gallery-dl is available.\n\nInstalled version: {0}\nLatest version: {1}.
-        /// </summary>
-        public static string NewVersionAvailable {
-            get {
-                return ResourceManager.GetString("NewVersionAvailable", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Busca una cadena traducida similar a Operation successfully completed.
         /// </summary>
         public static string OperationCompleted {
@@ -142,7 +133,7 @@ namespace Gallery_dl_UI {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Twitter has changed its authentication system, you now need to add your acount to continue downloading from this platform..
+        ///   Busca una cadena traducida similar a Check your Cookies or the URL.
         /// </summary>
         public static string TwitterError {
             get {
