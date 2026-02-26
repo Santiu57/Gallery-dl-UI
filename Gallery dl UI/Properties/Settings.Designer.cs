@@ -261,5 +261,17 @@ namespace Gallery_dl_UI.Properties {
                 this["Apis"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("cunnyx-x|skibidix-x")]
+        public string Filters {
+            get {
+                return ((string)(this["Filters"]));
+            }
+            set {
+                this["Filters"] = value;
+            }
+        }
     }
 }

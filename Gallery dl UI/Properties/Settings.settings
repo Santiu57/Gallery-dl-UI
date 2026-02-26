@@ -62,5 +62,8 @@
     <Setting Name="Apis" Type="System.String" Scope="User">
       <Value Profile="(Default)">gelbooru</Value>
     </Setting>
+    <Setting Name="Filters" Type="System.String" Scope="User">
+      <Value Profile="(Default)">cunnyx-x|skibidix-x</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

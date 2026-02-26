@@ -346,10 +346,6 @@ namespace Gallery_dl_UI
                     mini.AddControl(btn);
                 }
             }
-            mini.AddButton("save", () =>
-            {
-                mini.Close();
-            });
 
             mini.MaximumSize = new Size(800, 800);
 

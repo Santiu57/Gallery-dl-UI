@@ -26,6 +26,7 @@ namespace Gallery_dl_UI
             ForceRefresh(this);
             LoadArguments();
             ApiLoad();
+            FiltersLoad();
         }
 
         public static void TraverseAllControls(Control parent, Action<Control> action)
@@ -460,18 +461,53 @@ namespace Gallery_dl_UI
         {
             public Func<string, bool> Condition { get; set; }
             public Func<string, string> Action { get; set; }
+            public string ModSite { get; set; }
+            public string Site { get; set; }
 
-            public UrlFilter(Func<string, bool> condition, Func<string, string> action, List<UrlFilter> container)
+            public UrlFilter(string modsite, string site)
             {
-                Condition = condition;
-                Action = action;
-                container.Add(this);
+                ModSite = modsite;
+                Site = site;
+                Condition = (url => ExtractSiteName(url) == modsite);
+                Action = url => url.Replace(modsite, site);
             }
         }
+        public void FiltersSave()
+        {
+            List<string> filters = new List<string> { };
+            foreach (var filter in UrlsFilters)
+            {
+                string fullFilter = $"{filter.ModSite}-{filter.Site}";
+                filters.Add(fullFilter);
+            }
 
-        UrlFilter CunnyX = new UrlFilter(url => ExtractSiteName(url) == "cunnyx", url => url.Replace("cunnyx", "x"), UrlsFilters);
-        UrlFilter SkibidiX = new UrlFilter(url => ExtractSiteName(url) == "skibidix", url => url.Replace("skibidix", "x"), UrlsFilters);
+            Properties.Settings.Default.Filters = string.Join("|", filters);
+            Properties.Settings.Default.Save();
+        }
+        public void FiltersLoad()
+        {
+            UrlsFilters.Clear();
 
+            var saved = Properties.Settings.Default.Filters;
+
+            if (string.IsNullOrWhiteSpace(saved))
+                return;
+
+            var filters = saved.Split('|', StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var filter in filters.Distinct())
+            {
+                string[] f = filter.Split('-'); 
+                string modsite = f[0];
+                string site = f[1];
+                CreateFilter(modsite,site);
+            }
+        }
+        public void CreateFilter(string modsite, string site)
+        {
+            UrlFilter filter = new UrlFilter(modsite, site);
+            UrlsFilters.Add(filter);
+        }
 
         //Sites to have just one instance at the same time
         public static List<ApiSite> ApiSites = new List<ApiSite>();
@@ -602,7 +638,7 @@ namespace Gallery_dl_UI
             btnClear.BackgroundImage = Image.FromFile("images/clear.png");
             btnClear.ImageAlign = ContentAlignment.MiddleCenter;
             btnClear.BackgroundImageLayout = ImageLayout.Stretch;
-            tsbtnApiSites.Image = Image.FromFile("images/api.png");
+            tsbtnFiltersApis.Image = Image.FromFile("images/filter.png");
             this.Icon = ConvertImageToIcon("images/icon.png");
         }
 
@@ -966,7 +1002,7 @@ namespace Gallery_dl_UI
 
             public Panel ContentPanel => _contentPanel;
 
-            public MiniForm(string title = "", Size? size = null)
+            public MiniForm(string title = "", Size? size = null, bool bottomButton = false)
             {
                 Text = title;
 
@@ -998,7 +1034,9 @@ namespace Gallery_dl_UI
                 };
 
                 Controls.Add(_contentPanel);
-                Controls.Add(_buttonPanel);
+                
+                if (bottomButton)
+                    Controls.Add(_buttonPanel);
             }
 
             // 🔹 Agregar cualquier control manualmente
@@ -1054,8 +1092,9 @@ namespace Gallery_dl_UI
 
         private void tsbtnApiSites_Click(object sender, EventArgs e)
         {
-            MiniForm Api = new MiniForm("API Sites Manager");
-            DataGridView sites = new DataGridView
+            MiniForm FiltersApi = new MiniForm("Filters and Api Sites");
+
+            DataGridView Filters = new DataGridView
             {
                 Dock = DockStyle.Fill,
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
@@ -1065,9 +1104,10 @@ namespace Gallery_dl_UI
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
                 ColumnHeadersHeight = Properties.Settings.Default.MainFont != null ? (int)(Properties.Settings.Default.MainFont.Size * 2.5) : 40
             };
-            sites.CellMouseClick += (s, e) =>
+
+            Filters.CellMouseClick += (s, e) =>
             {
-                if (e.RowIndex == sites.RowCount - 1)
+                if (e.RowIndex == Filters.RowCount - 1)
                     return;
                 if (e.Button != MouseButtons.Right)
                     return;
@@ -1075,11 +1115,69 @@ namespace Gallery_dl_UI
                 if (e.RowIndex < 0 || e.ColumnIndex < 0)
                     return;
 
-                string site = sites.Rows[e.RowIndex].Cells[0].Value?.ToString();
+                string filter = Filters.Rows[e.RowIndex].Cells[0].Value?.ToString();
+
+                if (string.IsNullOrWhiteSpace(filter))
+                {
+                    Filters.Rows.RemoveAt(e.RowIndex);
+                    return;
+                }
+
+                var confirm = MessageBox.Show(
+                    $"Delete Filter to '{filter}'?",
+                    "Confirm",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
+
+                if (confirm != DialogResult.Yes)
+                    return;
+
+                // Buscar primero
+                var filterToRemove = UrlsFilters.FirstOrDefault(a => a.ModSite == filter);
+
+                if (filterToRemove != null)
+                {
+                    UrlsFilters.Remove(filterToRemove);
+                }
+
+                Filters.Rows.RemoveAt(e.RowIndex);
+            };
+
+            FiltersApi.AddControl(new Label{Text = "Filters"});
+            FiltersApi.AddControl(Filters);
+            Filters.Columns.Add("Modificated Site", "ModSite");
+            Filters.Columns.Add("Original Site", "Site");
+            foreach (var filter in UrlsFilters)
+            {
+                if (!string.IsNullOrWhiteSpace(filter.Site) || !string.IsNullOrWhiteSpace(filter.ModSite))
+                    Filters.Rows.Add(filter.ModSite,filter.Site);
+            }
+
+            DataGridView ApiSite = new DataGridView
+            {
+                Dock = DockStyle.Fill,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                RowHeadersVisible = false,
+                AllowUserToAddRows = true,
+                AllowUserToDeleteRows = true,
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+                ColumnHeadersHeight = Properties.Settings.Default.MainFont != null ? (int)(Properties.Settings.Default.MainFont.Size * 2.5) : 40
+            };
+            ApiSite.CellMouseClick += (s, e) =>
+            {
+                if (e.RowIndex == ApiSite.RowCount - 1)
+                    return;
+                if (e.Button != MouseButtons.Right)
+                    return;
+
+                if (e.RowIndex < 0 || e.ColumnIndex < 0)
+                    return;
+
+                string site = ApiSite.Rows[e.RowIndex].Cells[0].Value?.ToString();
 
                 if (string.IsNullOrWhiteSpace(site))
                 {
-                    sites.Rows.RemoveAt(e.RowIndex);
+                    ApiSite.Rows.RemoveAt(e.RowIndex);
                     return;
                 }
 
@@ -1100,38 +1198,63 @@ namespace Gallery_dl_UI
                     ApiSites.Remove(apiToRemove);
                 }
 
-                sites.Rows.RemoveAt(e.RowIndex);
+                ApiSite.Rows.RemoveAt(e.RowIndex);
             };
-            Api.FormClosing += (s, e) =>
+            FiltersApi.FormClosing += (s, e) =>
             {
-                var newSites = sites.Rows
+                var newSites = ApiSite.Rows
                     .Cast<DataGridViewRow>()
                     .Where(r => r.Cells[0].Value != null)
-                    .Select(r => r.Cells[0].Value.ToString())
+                    .Select(r => r.Cells[0].Value?.ToString())
                     .Where(s => !string.IsNullOrWhiteSpace(s))
                     .ToList();
 
-                // Eliminar los que ya no existen
                 ApiSites.RemoveAll(a => !newSites.Contains(a.Site));
 
-                // Agregar nuevos
                 foreach (var site in newSites)
                 {
                     if (!ApiSites.Any(a => a.Site == site && a.Site != null))
                         CreateApi(site);
                 }
 
+                var filtersmodsites = Filters.Rows
+                    .Cast<DataGridViewRow>()
+                    .Where(r => r.Cells[0].Value != null || r.Cells[1].Value != null)
+                    .Select(r => r.Cells[0].Value?.ToString())
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .ToList();
+
+                var filterssites = Filters.Rows
+                    .Cast<DataGridViewRow>()
+                    .Where(r => r.Cells[0].Value != null || r.Cells[1].Value != null)
+                    .Select(r => r.Cells[0].Value?.ToString())
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .ToList();
+
+                UrlsFilters.Clear();
+
+                for (int i = 0; i < filtersmodsites.Count; i++)
+                {
+                    CreateFilter(filtersmodsites[i], filterssites[i]);
+                }
+                
+
+                FiltersSave();
                 ApiSave();
             };
-            Api.SetMainControl(sites);
-            sites.Columns.Add("Sites", "Sites");
+
+            FiltersApi.AddControl(new Label { Text = "Api Sites" });
+            FiltersApi.AddControl(ApiSite);
+            ApiSite.Columns.Add("Sites", "Sites");
             foreach (var api in ApiSites)
             {
                 if (!string.IsNullOrWhiteSpace(api.Site))
-                    sites.Rows.Add(api.Site);
+                    ApiSite.Rows.Add(api.Site);
             }
-            Api.FontAndColorMini();
-            Api.ShowDialog();
+
+
+            FiltersApi.FontAndColorMini();
+            FiltersApi.ShowDialog();
 
         }
     }
