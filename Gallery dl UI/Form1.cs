@@ -602,6 +602,7 @@ namespace Gallery_dl_UI
             btnClear.BackgroundImage = Image.FromFile("images/clear.png");
             btnClear.ImageAlign = ContentAlignment.MiddleCenter;
             btnClear.BackgroundImageLayout = ImageLayout.Stretch;
+            tsbtnApiSites.Image = Image.FromFile("images/api.png");
             this.Icon = ConvertImageToIcon("images/icon.png");
         }
 
