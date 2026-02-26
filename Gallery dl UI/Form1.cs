@@ -468,8 +468,15 @@ namespace Gallery_dl_UI
             {
                 ModSite = modsite;
                 Site = site;
-                Condition = (url => ExtractSiteName(url) == modsite);
-                Action = url => url.Replace(modsite, site);
+                Condition = url => ExtractSiteName(url).Equals(ModSite, StringComparison.OrdinalIgnoreCase);
+
+                Action = url =>
+                {
+                    var uri = new Uri(url);
+                    var builder = new UriBuilder(uri);
+                    builder.Host = builder.Host.Replace(ModSite, Site, StringComparison.OrdinalIgnoreCase);
+                    return builder.Uri.ToString();
+                };
             }
         }
         public void FiltersSave()
@@ -1217,27 +1224,21 @@ namespace Gallery_dl_UI
                         CreateApi(site);
                 }
 
-                var filtersmodsites = Filters.Rows
-                    .Cast<DataGridViewRow>()
-                    .Where(r => r.Cells[0].Value != null || r.Cells[1].Value != null)
-                    .Select(r => r.Cells[0].Value?.ToString())
-                    .Where(s => !string.IsNullOrWhiteSpace(s))
-                    .ToList();
-
-                var filterssites = Filters.Rows
-                    .Cast<DataGridViewRow>()
-                    .Where(r => r.Cells[0].Value != null || r.Cells[1].Value != null)
-                    .Select(r => r.Cells[0].Value?.ToString())
-                    .Where(s => !string.IsNullOrWhiteSpace(s))
-                    .ToList();
-
                 UrlsFilters.Clear();
 
-                for (int i = 0; i < filtersmodsites.Count; i++)
+                foreach (DataGridViewRow row in Filters.Rows)
                 {
-                    CreateFilter(filtersmodsites[i], filterssites[i]);
+                    if (row.IsNewRow)
+                        continue;
+
+                    var modSite = row.Cells[0].Value?.ToString();
+                    var site = row.Cells[1].Value?.ToString();
+
+                    if (string.IsNullOrWhiteSpace(modSite) || string.IsNullOrWhiteSpace(site))
+                        continue;
+
+                    CreateFilter(modSite.Trim(), site.Trim());
                 }
-                
 
                 FiltersSave();
                 ApiSave();

@@ -109,6 +109,7 @@ namespace Gallery_dl_UI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Segoe UI, 9pt")]
         public global::System.Drawing.Font MainFont {
             get {
                 return ((global::System.Drawing.Font)(this["MainFont"]));

@@ -24,7 +24,7 @@
       <Value Profile="(Default)">ErrorLog.txt</Value>
     </Setting>
     <Setting Name="MainFont" Type="System.Drawing.Font" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">Segoe UI, 9pt</Value>
     </Setting>
     <Setting Name="ArgumentsState" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
