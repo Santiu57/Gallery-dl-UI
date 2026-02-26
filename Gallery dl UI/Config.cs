@@ -235,7 +235,7 @@ namespace Gallery_dl_UI
 
         private void btnNotifications_Click(object sender, EventArgs e)
         {
-            var mini = new MiniForm("Notification Config");
+            var mini = new MiniForm("Notification Config", new Size(350,150));
 
             var row = new FlowLayoutPanel
             {

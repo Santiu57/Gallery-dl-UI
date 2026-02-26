@@ -249,5 +249,17 @@ namespace Gallery_dl_UI.Properties {
                 this["ShowNotifs"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("gelbooru")]
+        public string Apis {
+            get {
+                return ((string)(this["Apis"]));
+            }
+            set {
+                this["Apis"] = value;
+            }
+        }
     }
 }

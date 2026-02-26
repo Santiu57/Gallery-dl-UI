@@ -36,6 +36,7 @@
             tsbtnConfig = new ToolStripButton();
             tsbtnArgs = new ToolStripButton();
             tsbtnLog = new ToolStripButton();
+            tsbtnApiSites = new ToolStripButton();
             btnStartdownload = new Button();
             txbAddUrl = new TextBox();
             Sclip = new WK.Libraries.SharpClipboardNS.SharpClipboard(components);
@@ -51,7 +52,7 @@
             // tsBar
             // 
             tsBar.ImageScalingSize = new Size(20, 20);
-            tsBar.Items.AddRange(new ToolStripItem[] { tsStatusLabel, tsProgresBar, tsbtnConfig, tsbtnArgs, tsbtnLog });
+            tsBar.Items.AddRange(new ToolStripItem[] { tsStatusLabel, tsProgresBar, tsbtnConfig, tsbtnArgs, tsbtnLog, tsbtnApiSites });
             tsBar.Location = new Point(0, 0);
             tsBar.Name = "tsBar";
             tsBar.Size = new Size(380, 27);
@@ -104,6 +105,18 @@
             tsbtnLog.Text = "toolStripButton1";
             tsbtnLog.ToolTipText = "Log";
             tsbtnLog.Click += tsbtnLog_Click;
+            // 
+            // tsbtnApiSites
+            // 
+            tsbtnApiSites.Alignment = ToolStripItemAlignment.Right;
+            tsbtnApiSites.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbtnApiSites.Image = (Image)resources.GetObject("tsbtnApiSites.Image");
+            tsbtnApiSites.ImageTransparentColor = Color.Magenta;
+            tsbtnApiSites.Name = "tsbtnApiSites";
+            tsbtnApiSites.Size = new Size(29, 24);
+            tsbtnApiSites.Text = "toolStripButton1";
+            tsbtnApiSites.ToolTipText = "List of sites that needs an Api, these are limited to 1 thread";
+            tsbtnApiSites.Click += tsbtnApiSites_Click;
             // 
             // btnStartdownload
             // 
@@ -217,5 +230,6 @@
         private ToolStripButton tsbtnLog;
         private ToolTip tpTexts;
         private ToolStripButton tsbtnArgs;
+        private ToolStripButton tsbtnApiSites;
     }
 }

@@ -343,17 +343,13 @@ namespace Gallery_dl_UI
 
                         UpdateArgumentTextBox(this, arg);
                     });
-                    if (isLast)
-                    {
-                        mini.AddControl(btn, true);
-                    }
-                    else
-                    {
-                        mini.AddControl(btn);
-                    }
+                    mini.AddControl(btn);
                 }
             }
-            mini.AddButton("folder", () => { arg.Value += "/"; UpdateArgumentTextBox(this, arg); }, false);
+            mini.AddButton("save", () =>
+            {
+                mini.Close();
+            });
 
             mini.MaximumSize = new Size(800, 800);
 
@@ -375,7 +371,7 @@ namespace Gallery_dl_UI
                     arg.Value = browser;
                     UpdateArgumentTextBox(this, arg);
                 });
-                mini.AddControl(btn, true);
+                mini.AddControl(btn);
             }
             mini.MaximumSize = new Size(mini.Width, 200);
             mini.MiniWindowConfig();
@@ -395,6 +391,7 @@ namespace Gallery_dl_UI
 
         List<string> SupportedBrowsers = new List<string>
         {
+            "chrome",
             "chromium",
             "edge",
             "brave",

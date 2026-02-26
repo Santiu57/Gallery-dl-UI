@@ -25,6 +25,7 @@ namespace Gallery_dl_UI
             FontChange(this);
             ForceRefresh(this);
             LoadArguments();
+            ApiLoad();
         }
 
         public static void TraverseAllControls(Control parent, Action<Control> action)
@@ -252,18 +253,18 @@ namespace Gallery_dl_UI
             public string Location { get; set; }
             public string Url { get; set; }
 
-        public Log(string url)
+            public Log(string url)
             {
                 Date = DateTime.Now;
                 Site = ExtractSiteName(url);
                 Location = getPath();
                 Url = url;
             }
-             public string getPath()
+            public string getPath()
             {
                 string path = "";
                 Argument arg = DirectoryArgsFilter();
-                if ( arg != null)
+                if (arg != null)
                 {
                     path = arg.Value;
                 }
@@ -279,9 +280,9 @@ namespace Gallery_dl_UI
             {
                 Argument arg = null;
                 bool hasDirectoryArg = Args.Any(a => (a.Command == "-D" || a.Command == "-d") && a.Enabled);
-                if(hasDirectoryArg)
+                if (hasDirectoryArg)
                 {
-                    if(Args.Any(a => a.Command == "-D" && a.Enabled))
+                    if (Args.Any(a => a.Command == "-D" && a.Enabled))
                     {
                         arg = Args.First(a => a.Command == "-D" && a.Enabled);
                     }
@@ -481,18 +482,18 @@ namespace Gallery_dl_UI
 
             private readonly SemaphoreSlim _Apisemaphore = new(1, 1);
 
-            public ApiSite(string site, List<ApiSite> container)
+            public ApiSite(string site)
             {
                 Site = site;
-                container.Add(this);
             }
 
+            
             public async Task ExecuteAsync(string url, string Arguments)
             {
                 await _Apisemaphore.WaitAsync();
                 try
                 {
-                    await RunGalleryDl(url, Arguments); 
+                    await RunGalleryDl(url, Arguments);
                 }
                 finally
                 {
@@ -500,14 +501,42 @@ namespace Gallery_dl_UI
                 }
             }
         }
+        public void ApiSave()
+        {
+            var sites = ApiSites
+                .Where(a => !string.IsNullOrWhiteSpace(a.Site))
+                .Select(a => a.Site);
 
-        ApiSite Gelbooru = new ApiSite("gelbooru", ApiSites);
+            Properties.Settings.Default.Apis = string.Join("|", sites);
+            Properties.Settings.Default.Save();
+        }
+        public void ApiLoad()
+        {
+            ApiSites.Clear(); 
+
+            var saved = Properties.Settings.Default.Apis;
+
+            if (string.IsNullOrWhiteSpace(saved))
+                return;
+
+            var apis = saved.Split('|', StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var api in apis.Distinct())
+            {
+                CreateApi(api);
+            }
+        }
+        public void CreateApi(string site)
+        {
+            ApiSite api = new ApiSite(site);
+            ApiSites.Add(api);
+        }
 
         //Notification
 
         public static void NotificationShow(string title, string desc, bool playsound = true)
         {
-            if(!Properties.Settings.Default.ShowNotifs)
+            if (!Properties.Settings.Default.ShowNotifs)
                 return;
             try
             {
@@ -837,7 +866,7 @@ namespace Gallery_dl_UI
                 UseShellExecute = true,
                 CreateNoWindow = false
             };
-            
+
             using (var process = new Process())
             {
                 process.StartInfo = startInfo;
@@ -927,13 +956,90 @@ namespace Gallery_dl_UI
         private void tsbtnLog_Click(object sender, EventArgs e)
         {
             LogForm log = new LogForm();
-            log.ShowDialog(); 
+            log.ShowDialog();
         }
         public class MiniForm : Form
         {
-            private readonly FlowLayoutPanel FieldPanel;
+            private readonly Panel _contentPanel;
             private readonly FlowLayoutPanel _buttonPanel;
 
+            public Panel ContentPanel => _contentPanel;
+
+            public MiniForm(string title = "", Size? size = null)
+            {
+                Text = title;
+
+                FormBorderStyle = FormBorderStyle.FixedDialog;
+                StartPosition = FormStartPosition.CenterParent;
+                MaximizeBox = false;
+                MinimizeBox = false;
+
+                AutoScaleMode = AutoScaleMode.Font;
+
+                Size = size ?? new Size(600, 400);
+                MinimumSize = new Size(100, 100);
+                Padding = new Padding(10);
+
+                // 🔹 Panel principal de contenido
+                _contentPanel = new Panel
+                {
+                    Dock = DockStyle.Fill,
+                    AutoScroll = true
+                };
+
+                // 🔹 Panel inferior de botones
+                _buttonPanel = new FlowLayoutPanel
+                {
+                    Dock = DockStyle.Bottom,
+                    FlowDirection = FlowDirection.RightToLeft,
+                    Height = 45,
+                    Padding = new Padding(5)
+                };
+
+                Controls.Add(_contentPanel);
+                Controls.Add(_buttonPanel);
+            }
+
+            // 🔹 Agregar cualquier control manualmente
+            public void AddControl(Control control, DockStyle dock = DockStyle.Top)
+            {
+                control.Dock = dock;
+                _contentPanel.Controls.Add(control);
+                _contentPanel.Controls.SetChildIndex(control, 0); // mantiene orden natural
+            }
+
+            // 🔹 Agregar control que ocupe todo el espacio
+            public void SetMainControl(Control control)
+            {
+                _contentPanel.Controls.Clear();
+                control.Dock = DockStyle.Fill;
+                _contentPanel.Controls.Add(control);
+            }
+
+            // 🔹 Agregar botón inferior
+            public Button AddButton(string text, Action onClick, bool closeOnClick = true)
+            {
+                var button = new Button
+                {
+                    Text = text,
+                    AutoSize = true
+                };
+
+                button.Click += (s, e) =>
+                {
+                    onClick?.Invoke();
+                    if (closeOnClick)
+                        Close();
+                };
+
+                _buttonPanel.Controls.Add(button);
+                return button;
+            }
+            public void FontAndColorMini()
+            {
+                FontChange(this);
+                ColorComponents(this);
+            }
             public void MiniWindowConfig()
             {
                 this.FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -943,77 +1049,89 @@ namespace Gallery_dl_UI
                 this.ShowIcon = true;
                 this.Icon = MainForm.ConvertImageToIcon("images/icon.png");
             }
+        }
 
-            public void FontAndColorMini()
+        private void tsbtnApiSites_Click(object sender, EventArgs e)
+        {
+            MiniForm Api = new MiniForm("API Sites Manager");
+            DataGridView sites = new DataGridView
             {
-                MainForm.FontChange(this);
-                MainForm.TraverseAllControls(this, control =>
+                Dock = DockStyle.Fill,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                RowHeadersVisible = false,
+                AllowUserToAddRows = true,
+                AllowUserToDeleteRows = true,
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+                ColumnHeadersHeight = Properties.Settings.Default.MainFont != null ? (int)(Properties.Settings.Default.MainFont.Size * 2.5) : 40
+            };
+            sites.CellMouseClick += (s, e) =>
+            {
+                if (e.RowIndex == sites.RowCount - 1)
+                    return;
+                if (e.Button != MouseButtons.Right)
+                    return;
+
+                if (e.RowIndex < 0 || e.ColumnIndex < 0)
+                    return;
+
+                string site = sites.Rows[e.RowIndex].Cells[0].Value?.ToString();
+
+                if (string.IsNullOrWhiteSpace(site))
                 {
-                    if (control is not Panel)
-                    {
-                        control.BackColor = Properties.Settings.Default.MainBackColor;
-                        control.ForeColor = Properties.Settings.Default.MainForeColor;
-                    }
-                });
-            }
+                    sites.Rows.RemoveAt(e.RowIndex);
+                    return;
+                }
 
-            public MiniForm(string title = "")
-            {
-                Text = title;
+                var confirm = MessageBox.Show(
+                    $"Delete API site '{site}'?",
+                    "Confirm",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
 
-                FormBorderStyle = FormBorderStyle.FixedDialog;
-                StartPosition = FormStartPosition.CenterParent;
+                if (confirm != DialogResult.Yes)
+                    return;
 
-                AutoScaleMode = AutoScaleMode.Font;
+                // Buscar primero
+                var apiToRemove = ApiSites.FirstOrDefault(a => a.Site == site);
 
-                AutoSize = true;
-                MaximumSize = new Size(800, 800);
-                Padding = new Padding(10);
-
-                FlowLayoutPanel fieldPanel = new FlowLayoutPanel();
-                fieldPanel.FlowDirection = FlowDirection.TopDown;
-                fieldPanel.AutoSize = true;
-                fieldPanel.Margin = new Padding(0);
-                fieldPanel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-                fieldPanel.WrapContents = true;
-                fieldPanel.Dock = DockStyle.Fill;
-                fieldPanel.AutoScroll = true;
-
-                FieldPanel = fieldPanel;
-
-                _buttonPanel = new FlowLayoutPanel
+                if (apiToRemove != null)
                 {
-                    Dock = DockStyle.Bottom,
-                    FlowDirection = FlowDirection.RightToLeft,
-                    Height = 40
-                };
+                    ApiSites.Remove(apiToRemove);
+                }
 
-                this.Controls.Add(FieldPanel);
-                this.Controls.Add(_buttonPanel);
-            }
-
-
-            // 🔹 Agregar cualquier control
-            public void AddControl(Control control, bool flow = false)
+                sites.Rows.RemoveAt(e.RowIndex);
+            };
+            Api.FormClosing += (s, e) =>
             {
-                control.AutoSize = true;
-                control.Margin = new Padding(6);
-                FieldPanel.Controls.Add(control);
-                FieldPanel.SetFlowBreak(control, flow);
-            }
+                var newSites = sites.Rows
+                    .Cast<DataGridViewRow>()
+                    .Where(r => r.Cells[0].Value != null)
+                    .Select(r => r.Cells[0].Value.ToString())
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .ToList();
 
-            public Button AddButton(string text, Action onClick, bool closeOnClick = true)
-            { 
-                var button = new Button 
-                { 
-                    Text = text, 
-                    AutoSize = true 
-                }; 
-                button.Click += (s, e) => { onClick?.Invoke(); 
-                if (closeOnClick) Close(); }; 
-                _buttonPanel.Controls.Add(button); 
-                return button; 
+                // Eliminar los que ya no existen
+                ApiSites.RemoveAll(a => !newSites.Contains(a.Site));
+
+                // Agregar nuevos
+                foreach (var site in newSites)
+                {
+                    if (!ApiSites.Any(a => a.Site == site && a.Site != null))
+                        CreateApi(site);
+                }
+
+                ApiSave();
+            };
+            Api.SetMainControl(sites);
+            sites.Columns.Add("Sites", "Sites");
+            foreach (var api in ApiSites)
+            {
+                if (!string.IsNullOrWhiteSpace(api.Site))
+                    sites.Rows.Add(api.Site);
             }
+            Api.FontAndColorMini();
+            Api.ShowDialog();
+
         }
     }
 }
