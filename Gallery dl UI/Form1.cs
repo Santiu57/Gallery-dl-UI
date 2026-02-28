@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using WK.Libraries.SharpClipboardNS;
 using static Gallery_dl_UI.LogForm;
+using static Gallery_dl_UI.MainForm;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace Gallery_dl_UI
@@ -18,6 +19,36 @@ namespace Gallery_dl_UI
     {
         public MainForm()
         {
+
+            // Coloca esto en el inicio de tu programa (ej. Form_Load o Main)
+            ToastNotificationManagerCompat.OnActivated += toastArgs =>
+            {
+                // Extraemos los argumentos
+                ToastArguments args = ToastArguments.Parse(toastArgs.Argument);
+
+                // Ejecutamos en el hilo de la UI si es necesario
+                Application.OpenForms?[0]?.Invoke(new Action(() =>
+                {
+                    if (args.Contains("action"))
+                    {
+                        string value = args["action"];
+
+                        if (value == "getPixivToken")
+                        {
+                            getPixivToken(); // Tu método existente
+                        }
+
+                        // Lógica por defecto: Traer al frente
+                        var window = Application.OpenForms[0];
+                        if (window?.WindowState == FormWindowState.Minimized)
+                            window.WindowState = FormWindowState.Normal;
+
+                        window?.Activate();
+                        window?.Focus();
+                    }
+                }));
+            };
+
             InitializeComponent();
             ColorComponents(this);
             LoadImages();
@@ -48,10 +79,21 @@ namespace Gallery_dl_UI
         {
             TraverseAllControls(this, control =>
             {
-                control.Enabled = false;
+                if (control is ToolStrip)
+                {
+                    TraverseAllControls(control, tscontrols =>
+                    {
+                        tscontrols.Enabled = false;
+                    });
+                }
+                if (control is Button)
+                {
+                    control.Enabled = false;
+                }
             });
 
             BuilArgs();
+            BuildYTArgs();
 
             Urls = UrlExtractor(dgvUrlsFusion());
 
@@ -181,6 +223,12 @@ namespace Gallery_dl_UI
                             handled = true;
                             break;
                         }
+                    }
+
+                    if (YTsites.Contains(site))
+                    {
+                        await RunYTdlp(url);
+                        handled = true;
                     }
 
                     if (!handled)
@@ -366,7 +414,69 @@ namespace Gallery_dl_UI
         Argument BrowserCookies = new Argument("Cookies from Browser", Properties.Settings.Default.BrowserCookies, "--cookies-from-browser", "Use cookies from a supported browser to authenticate requests. (e.g. 'edge' or 'firefox')", Args, true, true);
         Argument ExtraArgs = new Argument("Extra Arguments", Properties.Settings.Default.ExtraArgs, "", "Any additional arguments you want to add to the command. Make sure to use the correct syntax", Args, true, false);
 
+        // YT-DLP Args
+        public static List<Argument> YTArgs = new();
 
+        Argument YTPath = new Argument(
+            "YTPath",
+            Path.Combine(Properties.Settings.Default.DestinationPath ?? Properties.Settings.Default.DirectoryPath, "youtube"),
+            "-P",
+            "Output template path",
+            YTArgs,
+            true
+        );
+
+        Argument YTFormat = new Argument(
+            "Format",
+            Properties.Settings.Default.YTFormat,
+            "--merge-output-format",
+            "Video format selector",
+            YTArgs,
+            true,
+            false
+        );
+
+        Argument YTExtractAudio = new Argument(
+            "Extract audio",
+            "--extract-audio",
+            "",
+            "Extract audio only",
+            YTArgs,
+            false,
+            Properties.Settings.Default.YTExtractAu
+        );
+
+        Argument YTAudioFormat = new Argument(
+            "Audio format",
+            Properties.Settings.Default.YTAuFormat,
+            "--audio-format",
+            "Audio format",
+            YTArgs,
+            true,
+            Properties.Settings.Default.YTExtractAu
+        );
+
+        Argument YTResolution = new Argument(
+            "Video Resolution",
+            Properties.Settings.Default.YTResolution,
+            "-f",
+            "Audio format",
+            YTArgs,
+            true
+        );
+
+        void BuildYTArgs()
+        {
+            YTArguments = "";
+            foreach (var arg in YTArgs)
+            {
+                string cmd = arg.ToCommandString();
+                if (!string.IsNullOrEmpty(cmd))
+                    YTArguments += cmd;
+            }
+        }
+
+        public string YTArguments = "";
 
         public class Argument
         {
@@ -504,10 +614,12 @@ namespace Gallery_dl_UI
 
             foreach (var filter in filters.Distinct())
             {
-                string[] f = filter.Split('-'); 
-                string modsite = f[0];
-                string site = f[1];
-                CreateFilter(modsite,site);
+                var parts = filter.Split('-', 2);
+
+                if (parts.Length != 2)
+                    continue;
+
+                CreateFilter(parts[0], parts[1]);
             }
         }
         public void CreateFilter(string modsite, string site)
@@ -530,7 +642,7 @@ namespace Gallery_dl_UI
                 Site = site;
             }
 
-            
+
             public async Task ExecuteAsync(string url, string Arguments)
             {
                 await _Apisemaphore.WaitAsync();
@@ -555,7 +667,7 @@ namespace Gallery_dl_UI
         }
         public void ApiLoad()
         {
-            ApiSites.Clear(); 
+            ApiSites.Clear();
 
             var saved = Properties.Settings.Default.Apis;
 
@@ -577,7 +689,7 @@ namespace Gallery_dl_UI
 
         //Notification
 
-        public static void NotificationShow(string title, string desc, bool playsound = true)
+        public static void NotificationShow(string title, string desc, bool playsound = true, ToastDuration duration = ToastDuration.Short, string actionArgs = "action=viewMain")
         {
             if (!Properties.Settings.Default.ShowNotifs)
                 return;
@@ -585,16 +697,18 @@ namespace Gallery_dl_UI
             {
                 var builder = new ToastContentBuilder()
                     .AddText(title)
-                    .AddText(desc);
+                    .AddText(desc)
+                    // Este argumento se envía a la app cuando el usuario hace clic
+                    .AddArgument("action", actionArgs);
+
                 builder.AddAppLogoOverride(new Uri(Path.Combine(Environment.CurrentDirectory, "images/icon.png")), ToastGenericAppLogoCrop.Default);
+
                 if (!playsound)
-                {
                     builder.AddAudio(null);
-                }
                 else
-                {
                     builder.AddAudio(new Uri("ms-winsoundevent:Notification.Default"));
-                }
+
+                builder.SetToastDuration(duration);
                 builder.Show();
             }
             catch (Exception ex)
@@ -646,6 +760,7 @@ namespace Gallery_dl_UI
             btnClear.ImageAlign = ContentAlignment.MiddleCenter;
             btnClear.BackgroundImageLayout = ImageLayout.Stretch;
             tsbtnFiltersApis.Image = Image.FromFile("images/filter.png");
+            tsbtnytdlp.Image = Image.FromFile("images/yt.png");
             this.Icon = ConvertImageToIcon("images/icon.png");
         }
 
@@ -731,6 +846,8 @@ namespace Gallery_dl_UI
             }
             else if (e.Button == MouseButtons.Right)
             {
+                if (Status == "Downloading")
+                    return;
                 dgvUrls.Rows.RemoveAt(e.RowIndex);
                 CurrentUrlsUpd();
             }
@@ -902,12 +1019,14 @@ namespace Gallery_dl_UI
 
         private void PixivTokenMissing()
         {
-            MessageBox.Show(Lang.PixivError, "Pixiv Error");
+            NotificationShow("Pixiv Error", Lang.PixivError, true, ToastDuration.Long, "getPixivToken");
+        }
+        private void getPixivToken()
+        {
             var startInfo = new ProcessStartInfo()
             {
-                FileName = "gallery-dl",
-                Arguments = "oauth:pixiv",
-                UseShellExecute = true,
+                FileName = "powershell.exe",
+                Arguments = "gallery-dl oauth:pixiv",
                 CreateNoWindow = false
             };
 
@@ -917,7 +1036,6 @@ namespace Gallery_dl_UI
                 process.Start();
             }
         }
-
         private void tsbtnArgs_Click(object sender, EventArgs e)
         {
             ArgsForm argsForm = new ArgsForm();
@@ -1041,7 +1159,7 @@ namespace Gallery_dl_UI
                 };
 
                 Controls.Add(_contentPanel);
-                
+
                 if (bottomButton)
                     Controls.Add(_buttonPanel);
             }
@@ -1150,14 +1268,14 @@ namespace Gallery_dl_UI
                 Filters.Rows.RemoveAt(e.RowIndex);
             };
 
-            FiltersApi.AddControl(new Label{Text = "Filters"});
+            FiltersApi.AddControl(new Label { Text = "Filters" });
             FiltersApi.AddControl(Filters);
             Filters.Columns.Add("Modificated Site", "ModSite");
             Filters.Columns.Add("Original Site", "Site");
             foreach (var filter in UrlsFilters)
             {
                 if (!string.IsNullOrWhiteSpace(filter.Site) || !string.IsNullOrWhiteSpace(filter.ModSite))
-                    Filters.Rows.Add(filter.ModSite,filter.Site);
+                    Filters.Rows.Add(filter.ModSite, filter.Site);
             }
 
             DataGridView ApiSite = new DataGridView
@@ -1257,6 +1375,299 @@ namespace Gallery_dl_UI
             FiltersApi.FontAndColorMini();
             FiltersApi.ShowDialog();
 
+        }
+        private Button Createbtn(string text, Action click)
+        {
+            Button btn = new Button();
+            btn.Text = text;
+            btn.Click += (s, e) => click();
+            return btn;
+        }
+        private void tsbtnytdlp_Click(object sender, EventArgs e)
+        {
+            MiniForm ytdlp = new MiniForm("YT-DLP config (Youtube)", new Size(300, 300));
+
+            //Resolution
+            ComboBox resolution = new ComboBox();
+            resolution.DropDownStyle = ComboBoxStyle.DropDownList;
+
+            foreach (string res in YTdlpResolutions)
+            {
+                resolution.Items.Add(res);
+            }
+            string Res = Properties.Settings.Default.YTResolution;
+
+            switch (Res)
+            {
+                case "bestvideo+bestaudio/best":
+                    Res = "Best";
+                    break;
+
+                case "bestvideo[height<=4320]+bestaudio/best[height<=4320]":
+                    Res = "4320p -> 8K";
+                    break;
+
+                case "bestvideo[height<=2160]+bestaudio/best[height<=2160]":
+                    Res = "2160p -> 4K";
+                    break;
+
+                case "bestvideo[height<=1440]+bestaudio/best[height<=1440]":
+                    Res = "1440p -> Quad HD";
+                    break;
+
+                case "bestvideo[height<=1080]+bestaudio/best[height<=1080]":
+                    Res = "1080p -> Full HD";
+                    break;
+
+                case "bestvideo[height<=720]+bestaudio/best[height<=720]":
+                    Res = "720p ->HD";
+                    break;
+
+                case "bestvideo[height<=480]+bestaudio/best[height<=480]":
+                    Res = "480p ->SD";
+                    break;
+
+                case "bestvideo[height<=360]+bestaudio/best[height<=360]":
+                    Res = "360p ->SD";
+                    break;
+
+                case "bestvideo[height<=240]+bestaudio/best[height<=240]":
+                    Res = "240p -> SD";
+                    break;
+
+                case "bestvideo[height<=144]+bestaudio/best[height<=144]":
+                    Res = "144p -> SD";
+                    break;
+            }
+
+            resolution.SelectedIndex = resolution.Items.IndexOf(Res);
+
+            Button install = Createbtn("Install YT-dlp", () => installYtdlp());
+            Button uptd = Createbtn("Update YT-dlp", () => UpdYtdlp());
+
+
+            //Video Format
+            ComboBox VidFormat = new ComboBox();
+            VidFormat.DropDownStyle = ComboBoxStyle.DropDownList;
+
+            foreach (string formats in YTdlpVidFormats)
+            {
+                VidFormat.Items.Add(formats);
+            }
+            VidFormat.SelectedIndex = VidFormat.Items.IndexOf(Properties.Settings.Default.YTFormat);
+
+            CheckBox ExtractAu = new CheckBox
+            {
+                Text = "Extract Audio",
+                Checked = Properties.Settings.Default.YTExtractAu,
+            };
+
+            ComboBox AuFormat = new ComboBox();
+            AuFormat.DropDownStyle = ComboBoxStyle.DropDownList;
+            AuFormat.Enabled = Properties.Settings.Default.YTExtractAu;
+
+            foreach (string formats in YTdlpAuFormats)
+            {
+                AuFormat.Items.Add(formats);
+            }
+            AuFormat.SelectedIndex = AuFormat.Items.IndexOf(Properties.Settings.Default.YTAuFormat);
+
+            ExtractAu.CheckedChanged += (s, e) =>
+            {
+                switch (ExtractAu.Checked)
+                {
+                    case true:
+                        resolution.Enabled = false;
+                        VidFormat.Enabled = false;
+                        AuFormat.Enabled = true;
+                        break;
+                    case false:
+                        resolution.Enabled = true;
+                        VidFormat.Enabled = true;
+                        AuFormat.Enabled = false;
+                        break;
+                }
+            };
+
+            ytdlp.FormClosing += (s, e) =>
+            {
+                Properties.Settings.Default.YTExtractAu = ExtractAu.Checked;
+                Properties.Settings.Default.YTAuFormat = AuFormat.Text;
+                Properties.Settings.Default.YTFormat = VidFormat.Text;
+
+                Res = resolution.Text;
+
+                switch (Res)
+                {
+                    case "Best":
+                        Res = "bestvideo+bestaudio/best";
+                        break;
+
+                    case "4320p -> 8K":
+                        Res = "bestvideo[height<=4320]+bestaudio/best[height<=4320]";
+                        break;
+
+                    case "2160p -> 4K":
+                        Res = "bestvideo[height<=2160]+bestaudio/best[height<=2160]";
+                        break;
+
+                    case "1440p -> Quad HD":
+                        Res = "bestvideo[height<=1440]+bestaudio/best[height<=1440]";
+                        break;
+
+                    case "1080p -> Full HD":
+                        Res = "bestvideo[height<=1080]+bestaudio/best[height<=1080]";
+                        break;
+
+                    case "720p ->HD":
+                        Res = "bestvideo[height<=720]+bestaudio/best[height<=720]";
+                        break;
+
+                    case "480p ->SD":
+                        Res = "bestvideo[height<=480]+bestaudio/best[height<=480]";
+                        break;
+
+                    case "360p ->SD":
+                        Res = "bestvideo[height<=360]+bestaudio/best[height<=360]";
+                        break;
+
+                    case "240p -> SD":
+                        Res = "bestvideo[height<=240]+bestaudio/best[height<=240]";
+                        break;
+
+                    case "144p -> SD":
+                        Res = "bestvideo[height<=144]+bestaudio/best[height<=144]";
+                        break;
+                }
+
+                Properties.Settings.Default.YTResolution = Res;
+
+                Properties.Settings.Default.Save();
+                MainForm.SaveArguments();
+            };
+
+            ytdlp.AddControl(new Label { Text = "Videos Resolution" });
+            ytdlp.AddControl(resolution);
+
+            ytdlp.AddControl(new Label { Text = "Videos Format" });
+            ytdlp.AddControl(VidFormat);
+
+            ytdlp.AddControl(ExtractAu);
+
+            ytdlp.AddControl(new Label { Text = "Audio Format" });
+            ytdlp.AddControl(AuFormat);
+
+            ytdlp.AddControl(new Label { Text = "" });
+            ytdlp.AddControl(install);
+            ytdlp.AddControl(uptd);
+
+            ytdlp.MiniWindowConfig();
+            ytdlp.FontAndColorMini();
+
+            ytdlp.ShowDialog();
+
+        }
+        private void installYtdlp()
+        {
+            var startInfo = new ProcessStartInfo()
+            {
+                FileName = "powershell.exe",
+                Arguments = "pip install yt-dlp",
+                CreateNoWindow = false
+            };
+
+            using (var process = new Process())
+            {
+                process.StartInfo = startInfo;
+                process.Start();
+            }
+        }
+        private void UpdYtdlp()
+        {
+            var startInfo = new ProcessStartInfo()
+            {
+                FileName = "powershell.exe",
+                Arguments = "pip install -U yt-dlp",
+                CreateNoWindow = false
+            };
+
+            using (var process = new Process())
+            {
+                process.StartInfo = startInfo;
+                process.Start();
+            }
+        }
+
+        public async Task RunYTdlp(string url)
+        {
+            var startInfo = new ProcessStartInfo()
+            {
+                FileName = "yt-dlp",
+                Arguments = YTArguments + url,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using (var process = new Process())
+            {
+                process.StartInfo = startInfo;
+                process.Start();
+                await process.WaitForExitAsync();
+            }
+        }
+
+
+        public static readonly List<string> YTdlpResolutions = new List<string>
+        {
+            "Best",
+            "4320p -> 8K",
+            "2160p -> 4K",
+            "1440p -> Quad HD",
+            "1080p -> Full HD",
+            "720p ->HD",
+            "480p ->SD",
+            "360p ->SD",
+            "240p -> SD",
+            "144p -> SD"
+        };
+        public static readonly List<string> YTdlpVidFormats = new List<string>
+        {
+            "mp4",
+            "webm",
+            "mkv",
+        };
+        public static readonly List<string> YTdlpAuFormats = new List<string>
+        {
+            "mp3",
+            "aac",
+            "alac",
+            "opus",
+            "vorbis",
+            "m4a",
+            "flac",
+            "wav"
+        };
+        public static readonly List<string> YTsites = new List<string>
+        {
+            "youtube",
+            "youtu"
+        };
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (dgvUrls.Rows.Count > 0)
+            {
+                DialogResult result = MessageBox.Show(
+                    "There are pending URLs. Do you really want to close?",
+                    "Confirm Exit",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
+
+                if (result == DialogResult.No)
+                {
+                    e.Cancel = true;
+                }
+            }
         }
     }
 }

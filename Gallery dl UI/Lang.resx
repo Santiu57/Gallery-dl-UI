@@ -133,7 +133,7 @@
     <value>Operation in progress</value>
   </data>
   <data name="PixivError" xml:space="preserve">
-    <value>Check or add your Pixiv refresh token. Follow the cmd window instructions.</value>
+    <value>Check or add your Pixiv refresh token. click to get your refresh token</value>
   </data>
   <data name="Sleeping" xml:space="preserve">
     <value>sleeping...</value>

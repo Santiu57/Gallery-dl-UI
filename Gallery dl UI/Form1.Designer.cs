@@ -37,6 +37,7 @@
             tsbtnArgs = new ToolStripButton();
             tsbtnLog = new ToolStripButton();
             tsbtnFiltersApis = new ToolStripButton();
+            tsbtnytdlp = new ToolStripButton();
             btnStartdownload = new Button();
             txbAddUrl = new TextBox();
             Sclip = new WK.Libraries.SharpClipboardNS.SharpClipboard(components);
@@ -52,7 +53,7 @@
             // tsBar
             // 
             tsBar.ImageScalingSize = new Size(20, 20);
-            tsBar.Items.AddRange(new ToolStripItem[] { tsStatusLabel, tsProgresBar, tsbtnConfig, tsbtnArgs, tsbtnLog, tsbtnFiltersApis });
+            tsBar.Items.AddRange(new ToolStripItem[] { tsStatusLabel, tsProgresBar, tsbtnConfig, tsbtnArgs, tsbtnLog, tsbtnFiltersApis, tsbtnytdlp });
             tsBar.Location = new Point(0, 0);
             tsBar.Name = "tsBar";
             tsBar.Size = new Size(380, 27);
@@ -117,6 +118,18 @@
             tsbtnFiltersApis.Text = "toolStripButton1";
             tsbtnFiltersApis.ToolTipText = "Filters and Api Sites";
             tsbtnFiltersApis.Click += tsbtnApiSites_Click;
+            // 
+            // tsbtnytdlp
+            // 
+            tsbtnytdlp.Alignment = ToolStripItemAlignment.Right;
+            tsbtnytdlp.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbtnytdlp.Image = (Image)resources.GetObject("tsbtnytdlp.Image");
+            tsbtnytdlp.ImageTransparentColor = Color.Magenta;
+            tsbtnytdlp.Name = "tsbtnytdlp";
+            tsbtnytdlp.Size = new Size(29, 24);
+            tsbtnytdlp.Text = "toolStripButton1";
+            tsbtnytdlp.ToolTipText = "YT-DLP for Youtube";
+            tsbtnytdlp.Click += tsbtnytdlp_Click;
             // 
             // btnStartdownload
             // 
@@ -206,6 +219,7 @@
             FormBorderStyle = FormBorderStyle.FixedToolWindow;
             Name = "MainForm";
             Text = "Gallery dl UI";
+            FormClosing += MainForm_FormClosing;
             Load += Form1_Load;
             tsBar.ResumeLayout(false);
             tsBar.PerformLayout();
@@ -231,5 +245,6 @@
         private ToolTip tpTexts;
         private ToolStripButton tsbtnArgs;
         private ToolStripButton tsbtnFiltersApis;
+        private ToolStripButton tsbtnytdlp;
     }
 }

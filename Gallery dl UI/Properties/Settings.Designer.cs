@@ -274,5 +274,53 @@ namespace Gallery_dl_UI.Properties {
                 this["Filters"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Best")]
+        public string YTResolution {
+            get {
+                return ((string)(this["YTResolution"]));
+            }
+            set {
+                this["YTResolution"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("mp4")]
+        public string YTFormat {
+            get {
+                return ((string)(this["YTFormat"]));
+            }
+            set {
+                this["YTFormat"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool YTExtractAu {
+            get {
+                return ((bool)(this["YTExtractAu"]));
+            }
+            set {
+                this["YTExtractAu"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("mp3")]
+        public string YTAuFormat {
+            get {
+                return ((string)(this["YTAuFormat"]));
+            }
+            set {
+                this["YTAuFormat"] = value;
+            }
+        }
     }
 }

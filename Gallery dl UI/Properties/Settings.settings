@@ -65,5 +65,17 @@
     <Setting Name="Filters" Type="System.String" Scope="User">
       <Value Profile="(Default)">cunnyx-x|skibidix-x</Value>
     </Setting>
+    <Setting Name="YTResolution" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Best</Value>
+    </Setting>
+    <Setting Name="YTFormat" Type="System.String" Scope="User">
+      <Value Profile="(Default)">mp4</Value>
+    </Setting>
+    <Setting Name="YTExtractAu" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="YTAuFormat" Type="System.String" Scope="User">
+      <Value Profile="(Default)">mp3</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
