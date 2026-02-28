@@ -92,6 +92,8 @@ namespace Gallery_dl_UI
                 }
             });
 
+            InitYTArgs();
+
             BuilArgs();
             BuildYTArgs();
 
@@ -419,7 +421,9 @@ namespace Gallery_dl_UI
 
         Argument YTPath = new Argument(
             "YTPath",
-            Path.Combine(Properties.Settings.Default.DestinationPath ?? Properties.Settings.Default.DirectoryPath, "youtube"),
+            Path.Combine(Properties.Settings.Default.DestinationPath
+            ?? Properties.Settings.Default.DirectoryPath
+            ?? Environment.CurrentDirectory, "youtube"),
             "-P",
             "Output template path",
             YTArgs,
@@ -433,7 +437,7 @@ namespace Gallery_dl_UI
             "Video format selector",
             YTArgs,
             true,
-            false
+            !Properties.Settings.Default.YTExtractAu
         );
 
         Argument YTExtractAudio = new Argument(
@@ -462,8 +466,67 @@ namespace Gallery_dl_UI
             "-f",
             "Audio format",
             YTArgs,
-            true
+            true,
+            !Properties.Settings.Default.YTExtractAu
         );
+
+        void InitYTArgs()
+        {
+            YTArgs.Clear();
+
+            YTPath = new Argument(
+                "YTPath",
+                Path.Combine(
+                    Properties.Settings.Default.DestinationPath
+                    ?? Properties.Settings.Default.DirectoryPath,
+                    "youtube"
+                ),
+                "-P",
+                "",
+                YTArgs,
+                true
+            );
+
+            YTFormat = new Argument(
+                "Format",
+                Properties.Settings.Default.YTFormat,
+                "--merge-output-format",
+                "",
+                YTArgs,
+                true,
+                !Properties.Settings.Default.YTExtractAu
+            );
+
+            YTExtractAudio = new Argument(
+                "Extract audio",
+                "--extract-audio",
+                "",
+                "",
+                YTArgs,
+                false,
+                Properties.Settings.Default.YTExtractAu
+            );
+
+            YTAudioFormat = new Argument(
+                "Audio format",
+                Properties.Settings.Default.YTAuFormat,
+                "--audio-format",
+                "",
+                YTArgs,
+                true,
+                Properties.Settings.Default.YTExtractAu
+            );
+
+            YTResolution = new Argument(
+                "Video Resolution",
+                Properties.Settings.Default.YTResolution,
+                "-f",
+                "",
+                YTArgs,
+                true,
+                !Properties.Settings.Default.YTExtractAu
+            );
+        }
 
         void BuildYTArgs()
         {
@@ -1390,6 +1453,7 @@ namespace Gallery_dl_UI
             //Resolution
             ComboBox resolution = new ComboBox();
             resolution.DropDownStyle = ComboBoxStyle.DropDownList;
+            resolution.Enabled = !Properties.Settings.Default.YTExtractAu;
 
             foreach (string res in YTdlpResolutions)
             {
@@ -1449,6 +1513,7 @@ namespace Gallery_dl_UI
             //Video Format
             ComboBox VidFormat = new ComboBox();
             VidFormat.DropDownStyle = ComboBoxStyle.DropDownList;
+            VidFormat.Enabled = !Properties.Settings.Default.YTExtractAu;
 
             foreach (string formats in YTdlpVidFormats)
             {
@@ -1614,6 +1679,7 @@ namespace Gallery_dl_UI
                 process.Start();
                 await process.WaitForExitAsync();
             }
+            MessageBox.Show(YTArguments + url);
         }
 
 
