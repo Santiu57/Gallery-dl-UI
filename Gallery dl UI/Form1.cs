@@ -1679,7 +1679,6 @@ namespace Gallery_dl_UI
                 process.Start();
                 await process.WaitForExitAsync();
             }
-            MessageBox.Show(YTArguments + url);
         }
 
 
