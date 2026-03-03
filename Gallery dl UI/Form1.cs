@@ -488,7 +488,8 @@ namespace Gallery_dl_UI
                 "YTPath",
                 Path.Combine(
                     Properties.Settings.Default.DestinationPath
-                    ?? Properties.Settings.Default.DirectoryPath,
+                    ?? Properties.Settings.Default.DirectoryPath
+                    ?? Environment.CurrentDirectory,
                     "youtube"
                 ),
                 "-P",
@@ -535,6 +536,15 @@ namespace Gallery_dl_UI
                 YTArgs,
                 true,
                 !Properties.Settings.Default.YTExtractAu
+            );
+            YTffmpeg = new Argument(
+                "ffmpeg location",
+                Properties.Settings.Default.ffmpeg,
+                "--ffmpeg-location",
+                "",
+                YTArgs,
+                true,
+                true
             );
         }
 
@@ -1644,18 +1654,18 @@ namespace Gallery_dl_UI
                 MainForm.SaveArguments();
             };
 
-            ytdlp.AddControl(new Label { Text = "Videos Resolution" });
+            ytdlp.AddControl(new Label { Text = "Videos Resolution:" });
             ytdlp.AddControl(resolution);
 
-            ytdlp.AddControl(new Label { Text = "Videos Format" });
+            ytdlp.AddControl(new Label { Text = "Videos Format:" });
             ytdlp.AddControl(VidFormat);
 
             ytdlp.AddControl(ExtractAu);
 
-            ytdlp.AddControl(new Label { Text = "Audio Format" });
+            ytdlp.AddControl(new Label { Text = "Audio Format:" });
             ytdlp.AddControl(AuFormat);
 
-            ytdlp.AddControl(new Label { Text = "Ffmpeg location" });
+            ytdlp.AddControl(new Label { Text = "Ffmpeg location:" });
             ytdlp.AddControl(row);
 
             ytdlp.AddControl(new Label { Text = "" });
