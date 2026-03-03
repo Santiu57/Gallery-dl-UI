@@ -322,5 +322,17 @@ namespace Gallery_dl_UI.Properties {
                 this["YTAuFormat"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\ffmpeg\\bin")]
+        public string ffmpeg {
+            get {
+                return ((string)(this["ffmpeg"]));
+            }
+            set {
+                this["ffmpeg"] = value;
+            }
+        }
     }
 }

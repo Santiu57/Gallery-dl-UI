@@ -77,5 +77,8 @@
     <Setting Name="YTAuFormat" Type="System.String" Scope="User">
       <Value Profile="(Default)">mp3</Value>
     </Setting>
+    <Setting Name="ffmpeg" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\ffmpeg\bin</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

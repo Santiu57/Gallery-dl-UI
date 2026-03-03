@@ -470,6 +470,16 @@ namespace Gallery_dl_UI
             !Properties.Settings.Default.YTExtractAu
         );
 
+        Argument YTffmpeg = new Argument(
+            "ffmpeg location",
+            Properties.Settings.Default.ffmpeg,
+            "--ffmpeg-location",
+            "",
+            YTArgs,
+            true,
+            true
+            );
+
         void InitYTArgs()
         {
             YTArgs.Clear();
@@ -1554,6 +1564,28 @@ namespace Gallery_dl_UI
                 }
             };
 
+            var row = new FlowLayoutPanel
+            {
+                AutoSize = true,
+                FlowDirection = FlowDirection.LeftToRight,
+                WrapContents = false
+            };
+
+            TextBox ffmpegdir = new TextBox() { PlaceholderText = "Path to ffmpeg", Text = Properties.Settings.Default.ffmpeg, Width = 200 };
+            Button selectffdir = new Button() { BackgroundImage = Image.FromFile("images/folder.png"), Width = 40, BackgroundImageLayout = ImageLayout.Stretch };
+
+            selectffdir.Click += (s, e) =>
+            {
+                FolderBrowserDialog dialog = new FolderBrowserDialog();
+                if(dialog.ShowDialog() == DialogResult.OK)
+                {
+                    ffmpegdir.Text = dialog.SelectedPath;
+                }
+            };
+
+            row.Controls.Add( ffmpegdir );
+            row.Controls.Add( selectffdir );
+
             ytdlp.FormClosing += (s, e) =>
             {
                 Properties.Settings.Default.YTExtractAu = ExtractAu.Checked;
@@ -1606,6 +1638,7 @@ namespace Gallery_dl_UI
                 }
 
                 Properties.Settings.Default.YTResolution = Res;
+                Properties.Settings.Default.ffmpeg = ffmpegdir.Text;
 
                 Properties.Settings.Default.Save();
                 MainForm.SaveArguments();
@@ -1621,6 +1654,9 @@ namespace Gallery_dl_UI
 
             ytdlp.AddControl(new Label { Text = "Audio Format" });
             ytdlp.AddControl(AuFormat);
+
+            ytdlp.AddControl(new Label { Text = "Ffmpeg location" });
+            ytdlp.AddControl(row);
 
             ytdlp.AddControl(new Label { Text = "" });
             ytdlp.AddControl(install);
@@ -1665,11 +1701,33 @@ namespace Gallery_dl_UI
 
         public async Task RunYTdlp(string url)
         {
+            if (!File.Exists(Path.Combine(Properties.Settings.Default.ffmpeg, "ffmpeg.exe")))
+            {
+                NotificationShow("YT-dlp missing dependencies","FFmpeg not found, install it and specify the path to it");
+                string errorLogPath = Properties.Settings.Default.ErrorLog;
+
+                try
+                {
+                    string logEntry =
+                        $"{url}{Environment.NewLine}";
+
+                    File.AppendAllText(errorLogPath, logEntry);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Failed to write to error log:\n" + ex.Message);
+                }
+
+                return;
+            }
+
             var startInfo = new ProcessStartInfo()
             {
                 FileName = "yt-dlp",
-                Arguments = YTArguments + url,
+                Arguments = $"{YTArguments} \"{url}\"",
                 UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 CreateNoWindow = true
             };
 
@@ -1677,9 +1735,19 @@ namespace Gallery_dl_UI
             {
                 process.StartInfo = startInfo;
                 process.Start();
+
+                string output = await process.StandardOutput.ReadToEndAsync();
+                string error = await process.StandardError.ReadToEndAsync();
+
                 await process.WaitForExitAsync();
+
+                if (process.ExitCode != 0)
+                {
+                    MessageBox.Show($"YT-DLP Error:\n{error}");
+                }
             }
         }
+
 
 
         public static readonly List<string> YTdlpResolutions = new List<string>
