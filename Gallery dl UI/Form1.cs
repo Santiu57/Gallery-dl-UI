@@ -480,6 +480,16 @@ namespace Gallery_dl_UI
             true
             );
 
+        Argument YTRemoteComponents = new Argument(
+            "remote components",
+            "ej:sjithub",
+            "--remote-components",
+            "(Enables JS challenge solver using deno)",
+            YTArgs,
+            true,
+            true
+        );
+
         void InitYTArgs()
         {
             YTArgs.Clear();
@@ -542,6 +552,16 @@ namespace Gallery_dl_UI
                 Properties.Settings.Default.ffmpeg,
                 "--ffmpeg-location",
                 "",
+                YTArgs,
+                true,
+                true
+            );
+
+            YTRemoteComponents = new Argument(
+                "Remote components",
+                "ej:sjithub",
+                "--remote-components",
+                "(Enables JS challenge solver using deno)",
                 YTArgs,
                 true,
                 true
@@ -1711,11 +1731,10 @@ namespace Gallery_dl_UI
 
         public async Task RunYTdlp(string url)
         {
+            string errorLogPath = Properties.Settings.Default.ErrorLog;
             if (!File.Exists(Path.Combine(Properties.Settings.Default.ffmpeg, "ffmpeg.exe")))
             {
                 NotificationShow("YT-dlp missing dependencies","FFmpeg not found, install it and specify the path to it");
-                string errorLogPath = Properties.Settings.Default.ErrorLog;
-
                 try
                 {
                     string logEntry =
@@ -1754,6 +1773,17 @@ namespace Gallery_dl_UI
                 if (process.ExitCode != 0)
                 {
                     MessageBox.Show($"YT-DLP Error:\n{error}");
+                    try
+                    {
+                        string logEntry =
+                            $"{url}{Environment.NewLine}";
+
+                        File.AppendAllText(errorLogPath, logEntry);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Failed to write to error log:\n" + ex.Message);
+                    }
                 }
             }
         }
