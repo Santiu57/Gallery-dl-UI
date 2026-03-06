@@ -53,7 +53,7 @@
             // tsBar
             // 
             tsBar.ImageScalingSize = new Size(20, 20);
-            tsBar.Items.AddRange(new ToolStripItem[] { tsStatusLabel, tsProgresBar, tsbtnConfig, tsbtnArgs, tsbtnLog, tsbtnFiltersApis, tsbtnytdlp });
+            tsBar.Items.AddRange(new ToolStripItem[] { tsStatusLabel, tsProgresBar, tsbtnConfig, tsbtnArgs, tsbtnytdlp, tsbtnFiltersApis, tsbtnLog });
             tsBar.Location = new Point(0, 0);
             tsBar.Name = "tsBar";
             tsBar.Size = new Size(380, 27);
@@ -80,7 +80,7 @@
             tsbtnConfig.Name = "tsbtnConfig";
             tsbtnConfig.Size = new Size(29, 24);
             tsbtnConfig.Text = "toolStripButton1";
-            tsbtnConfig.ToolTipText = "Configuration";
+            tsbtnConfig.ToolTipText = "App Configuration";
             tsbtnConfig.Click += tsbtnConfig_Click;
             // 
             // tsbtnArgs
