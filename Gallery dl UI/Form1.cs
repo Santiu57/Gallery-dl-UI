@@ -217,6 +217,14 @@ namespace Gallery_dl_UI
 
                     bool handled = false;
 
+                    foreach (var filter in UrlsFilters)
+                    {
+                        if (filter.Condition(url))
+                        {
+                            url = filter.Action(url);
+                        }
+                    }
+
                     foreach (var api in ApiSites)
                     {
                         if (api.Condition(site))
