@@ -504,12 +504,7 @@ namespace Gallery_dl_UI
 
             YTPath = new Argument(
                 "YTPath",
-                Path.Combine(
-                    Properties.Settings.Default.DestinationPath
-                    ?? Properties.Settings.Default.DirectoryPath
-                    ?? Environment.CurrentDirectory,
-                    "youtube"
-                ),
+                Properties.Settings.Default.YTOutput,
                 "-P",
                 "",
                 YTArgs,
@@ -665,7 +660,7 @@ namespace Gallery_dl_UI
         private void sharpClipboard1_ClipboardChanged(object sender, WK.Libraries.SharpClipboardNS.SharpClipboard.ClipboardChangedEventArgs e)
         {
             string contenido = e.Content.ToString().Trim();
-            if (Status == "Downloading")
+            if (Status == "Downloading" && ValidUrl(contenido))
             {
                 NotificationShow(Lang.OperationInProgress, Lang.WaitForFinish);
                 return;
@@ -1496,6 +1491,13 @@ namespace Gallery_dl_UI
         }
         private void tsbtnytdlp_Click(object sender, EventArgs e)
         {
+
+            if (string.IsNullOrEmpty(Properties.Settings.Default.YTOutput))
+            {
+                Properties.Settings.Default.YTOutput = Path.Combine(Environment.CurrentDirectory, "youtube");
+                Properties.Settings.Default.Save();
+            }
+
             MiniForm ytdlp = new MiniForm("YT-DLP config (Youtube)", new Size(300, 300));
 
             //Resolution
@@ -1602,7 +1604,7 @@ namespace Gallery_dl_UI
                 }
             };
 
-            var row = new FlowLayoutPanel
+            var ffmpeg = new FlowLayoutPanel
             {
                 AutoSize = true,
                 FlowDirection = FlowDirection.LeftToRight,
@@ -1621,8 +1623,30 @@ namespace Gallery_dl_UI
                 }
             };
 
-            row.Controls.Add( ffmpegdir );
-            row.Controls.Add( selectffdir );
+            ffmpeg.Controls.Add( ffmpegdir );
+            ffmpeg.Controls.Add( selectffdir );
+
+            var Output = new FlowLayoutPanel
+            {
+                AutoSize = true,
+                FlowDirection = FlowDirection.LeftToRight,
+                WrapContents = false
+            };
+
+            TextBox Outputdir = new TextBox() { PlaceholderText = "Path to ffmpeg", Text = Properties.Settings.Default.YTOutput, Width = 200 };
+            Button selectOutputdir = new Button() { BackgroundImage = Image.FromFile("images/folder.png"), Width = 40, BackgroundImageLayout = ImageLayout.Stretch };
+
+            selectffdir.Click += (s, e) =>
+            {
+                FolderBrowserDialog dialog = new FolderBrowserDialog();
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    selectOutputdir.Text = dialog.SelectedPath;
+                }
+            };
+
+            Output.Controls.Add(Outputdir);
+            Output.Controls.Add(selectOutputdir);
 
             ytdlp.FormClosing += (s, e) =>
             {
@@ -1677,6 +1701,7 @@ namespace Gallery_dl_UI
 
                 Properties.Settings.Default.YTResolution = Res;
                 Properties.Settings.Default.ffmpeg = ffmpegdir.Text;
+                Properties.Settings.Default.YTOutput = Outputdir.Text;
 
                 Properties.Settings.Default.Save();
                 MainForm.SaveArguments();
@@ -1688,13 +1713,16 @@ namespace Gallery_dl_UI
             ytdlp.AddControl(new Label { Text = "Videos Format:" });
             ytdlp.AddControl(VidFormat);
 
+            ytdlp.AddControl(new Label { Text = "Videos output folder:" });
+            ytdlp.AddControl(Output);
+
             ytdlp.AddControl(ExtractAu);
 
             ytdlp.AddControl(new Label { Text = "Audio Format:" });
             ytdlp.AddControl(AuFormat);
 
             ytdlp.AddControl(new Label { Text = "Ffmpeg location:" });
-            ytdlp.AddControl(row);
+            ytdlp.AddControl(ffmpeg);
 
             ytdlp.AddControl(new Label { Text = "" });
             ytdlp.AddControl(install);

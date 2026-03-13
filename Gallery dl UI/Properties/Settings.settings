@@ -80,5 +80,8 @@
     <Setting Name="ffmpeg" Type="System.String" Scope="User">
       <Value Profile="(Default)">C:\ffmpeg\bin</Value>
     </Setting>
+    <Setting Name="YTOutput" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -334,5 +334,17 @@ namespace Gallery_dl_UI.Properties {
                 this["ffmpeg"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string YTOutput {
+            get {
+                return ((string)(this["YTOutput"]));
+            }
+            set {
+                this["YTOutput"] = value;
+            }
+        }
     }
 }

@@ -106,7 +106,7 @@ namespace Gallery_dl_UI {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Check or add your Pixiv refresh token. click to get your refresh token.
+        ///   Busca una cadena traducida similar a Check or add your Pixiv refresh token, if have it, retry. Click to get your refresh token.
         /// </summary>
         public static string PixivError {
             get {
