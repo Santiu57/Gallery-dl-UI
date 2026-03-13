@@ -1636,12 +1636,12 @@ namespace Gallery_dl_UI
             TextBox Outputdir = new TextBox() { PlaceholderText = "Path to ffmpeg", Text = Properties.Settings.Default.YTOutput, Width = 200 };
             Button selectOutputdir = new Button() { BackgroundImage = Image.FromFile("images/folder.png"), Width = 40, BackgroundImageLayout = ImageLayout.Stretch };
 
-            selectffdir.Click += (s, e) =>
+            selectOutputdir.Click += (s, e) =>
             {
                 FolderBrowserDialog dialog = new FolderBrowserDialog();
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    selectOutputdir.Text = dialog.SelectedPath;
+                    Outputdir.Text = dialog.SelectedPath;
                 }
             };
 
