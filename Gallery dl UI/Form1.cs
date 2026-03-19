@@ -1,3 +1,4 @@
+
 using Gallery_dl_UI.Properties;
 using Microsoft.Toolkit.Uwp.Notifications;
 using System.Diagnostics;
@@ -11,7 +12,6 @@ using System.Text.RegularExpressions;
 using WK.Libraries.SharpClipboardNS;
 using static Gallery_dl_UI.LogForm;
 using static Gallery_dl_UI.MainForm;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace Gallery_dl_UI
 {
@@ -166,7 +166,7 @@ namespace Gallery_dl_UI
                 if (string.IsNullOrWhiteSpace(candidate))
                     continue;
 
-                if (Uri.TryCreate(candidate, UriKind.Absolute, out Uri uri))
+                if (System.Uri.TryCreate(candidate, UriKind.Absolute, out Uri uri))
                 {
                     if (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
                         continue;
@@ -1617,14 +1617,14 @@ namespace Gallery_dl_UI
             selectffdir.Click += (s, e) =>
             {
                 FolderBrowserDialog dialog = new FolderBrowserDialog();
-                if(dialog.ShowDialog() == DialogResult.OK)
+                if (dialog.ShowDialog() == DialogResult.OK)
                 {
                     ffmpegdir.Text = dialog.SelectedPath;
                 }
             };
 
-            ffmpeg.Controls.Add( ffmpegdir );
-            ffmpeg.Controls.Add( selectffdir );
+            ffmpeg.Controls.Add(ffmpegdir);
+            ffmpeg.Controls.Add(selectffdir);
 
             var Output = new FlowLayoutPanel
             {
@@ -1770,7 +1770,7 @@ namespace Gallery_dl_UI
             string errorLogPath = Properties.Settings.Default.ErrorLog;
             if (!File.Exists(Path.Combine(Properties.Settings.Default.ffmpeg, "ffmpeg.exe")))
             {
-                NotificationShow("YT-dlp missing dependencies","FFmpeg not found, install it and specify the path to it");
+                NotificationShow("YT-dlp missing dependencies", "FFmpeg not found, install it and specify the path to it");
                 try
                 {
                     string logEntry =
@@ -1875,6 +1875,33 @@ namespace Gallery_dl_UI
                 if (result == DialogResult.No)
                 {
                     e.Cancel = true;
+                }
+            }
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            string exportFolder = Path.Combine(Environment.CurrentDirectory, "Exports");
+            Directory.CreateDirectory(exportFolder);
+
+            string fileName = $"urls_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt";
+            string filePath = Path.Combine(exportFolder, fileName);
+
+            foreach (DataGridViewRow row in dgvUrls.Rows)
+            {
+                if (row.IsNewRow) continue;
+
+                try
+                {
+                    string url = row.Cells[1].Value?.ToString();
+
+                    if (!string.IsNullOrEmpty(url))
+                    {
+                        File.AppendAllText(filePath, url + Environment.NewLine);
+                    }
+                }
+                catch
+                {
                 }
             }
         }

@@ -35,9 +35,9 @@
             tsProgresBar = new ToolStripProgressBar();
             tsbtnConfig = new ToolStripButton();
             tsbtnArgs = new ToolStripButton();
-            tsbtnLog = new ToolStripButton();
-            tsbtnFiltersApis = new ToolStripButton();
             tsbtnytdlp = new ToolStripButton();
+            tsbtnFiltersApis = new ToolStripButton();
+            tsbtnLog = new ToolStripButton();
             btnStartdownload = new Button();
             txbAddUrl = new TextBox();
             Sclip = new WK.Libraries.SharpClipboardNS.SharpClipboard(components);
@@ -46,6 +46,7 @@
             Url = new DataGridViewTextBoxColumn();
             btnClear = new Button();
             tpTexts = new ToolTip(components);
+            button1 = new Button();
             tsBar.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dgvUrls).BeginInit();
             SuspendLayout();
@@ -95,17 +96,17 @@
             tsbtnArgs.ToolTipText = "Gallery Dl Args";
             tsbtnArgs.Click += tsbtnArgs_Click;
             // 
-            // tsbtnLog
+            // tsbtnytdlp
             // 
-            tsbtnLog.Alignment = ToolStripItemAlignment.Right;
-            tsbtnLog.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            tsbtnLog.Image = (Image)resources.GetObject("tsbtnLog.Image");
-            tsbtnLog.ImageTransparentColor = Color.Magenta;
-            tsbtnLog.Name = "tsbtnLog";
-            tsbtnLog.Size = new Size(29, 24);
-            tsbtnLog.Text = "toolStripButton1";
-            tsbtnLog.ToolTipText = "Log";
-            tsbtnLog.Click += tsbtnLog_Click;
+            tsbtnytdlp.Alignment = ToolStripItemAlignment.Right;
+            tsbtnytdlp.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbtnytdlp.Image = (Image)resources.GetObject("tsbtnytdlp.Image");
+            tsbtnytdlp.ImageTransparentColor = Color.Magenta;
+            tsbtnytdlp.Name = "tsbtnytdlp";
+            tsbtnytdlp.Size = new Size(29, 24);
+            tsbtnytdlp.Text = "toolStripButton1";
+            tsbtnytdlp.ToolTipText = "YT-DLP for Youtube";
+            tsbtnytdlp.Click += tsbtnytdlp_Click;
             // 
             // tsbtnFiltersApis
             // 
@@ -119,17 +120,17 @@
             tsbtnFiltersApis.ToolTipText = "Filters and Api Sites";
             tsbtnFiltersApis.Click += tsbtnApiSites_Click;
             // 
-            // tsbtnytdlp
+            // tsbtnLog
             // 
-            tsbtnytdlp.Alignment = ToolStripItemAlignment.Right;
-            tsbtnytdlp.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            tsbtnytdlp.Image = (Image)resources.GetObject("tsbtnytdlp.Image");
-            tsbtnytdlp.ImageTransparentColor = Color.Magenta;
-            tsbtnytdlp.Name = "tsbtnytdlp";
-            tsbtnytdlp.Size = new Size(29, 24);
-            tsbtnytdlp.Text = "toolStripButton1";
-            tsbtnytdlp.ToolTipText = "YT-DLP for Youtube";
-            tsbtnytdlp.Click += tsbtnytdlp_Click;
+            tsbtnLog.Alignment = ToolStripItemAlignment.Right;
+            tsbtnLog.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            tsbtnLog.Image = (Image)resources.GetObject("tsbtnLog.Image");
+            tsbtnLog.ImageTransparentColor = Color.Magenta;
+            tsbtnLog.Name = "tsbtnLog";
+            tsbtnLog.Size = new Size(29, 24);
+            tsbtnLog.Text = "toolStripButton1";
+            tsbtnLog.ToolTipText = "Log";
+            tsbtnLog.Click += tsbtnLog_Click;
             // 
             // btnStartdownload
             // 
@@ -149,7 +150,7 @@
             txbAddUrl.Multiline = true;
             txbAddUrl.Name = "txbAddUrl";
             txbAddUrl.PlaceholderText = "Paste Urls to Add them";
-            txbAddUrl.Size = new Size(253, 27);
+            txbAddUrl.Size = new Size(220, 27);
             txbAddUrl.TabIndex = 2;
             txbAddUrl.TextChanged += txbAddUrl_TextChanged;
             // 
@@ -205,11 +206,24 @@
             btnClear.UseVisualStyleBackColor = true;
             btnClear.Click += btnClear_Click;
             // 
+            // button1
+            // 
+            button1.BackgroundImageLayout = ImageLayout.Stretch;
+            button1.Location = new Point(226, 222);
+            button1.Name = "button1";
+            button1.Size = new Size(27, 27);
+            button1.TabIndex = 5;
+            button1.Text = "↓";
+            tpTexts.SetToolTip(button1, "Clear List");
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click_1;
+            // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(9F, 18F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(380, 253);
+            Controls.Add(button1);
             Controls.Add(btnClear);
             Controls.Add(dgvUrls);
             Controls.Add(txbAddUrl);
@@ -246,5 +260,6 @@
         private ToolStripButton tsbtnArgs;
         private ToolStripButton tsbtnFiltersApis;
         private ToolStripButton tsbtnytdlp;
+        private Button button1;
     }
 }

@@ -235,7 +235,7 @@ namespace Gallery_dl_UI
 
         private void btnNotifications_Click(object sender, EventArgs e)
         {
-            var mini = new MiniForm("Notification Config", new Size(350,150), true);
+            var mini = new MiniForm("Notification Config", new Size(350, 150), true);
 
             var row = new FlowLayoutPanel
             {
@@ -260,7 +260,7 @@ namespace Gallery_dl_UI
 
             if (!Properties.Settings.Default.ShowNotifs)
             {
-                mini.AddButton("Turn on all notifs", () => 
+                mini.AddButton("Turn on all notifs", () =>
                 {
                     Properties.Settings.Default.ShowNotifs = true;
                     Properties.Settings.Default.Save();

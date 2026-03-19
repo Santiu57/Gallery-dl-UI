@@ -31,7 +31,6 @@
             components = new System.ComponentModel.Container();
             label1 = new Label();
             nudSimultaneousDownloads = new NumericUpDown();
-            btnSave = new Button();
             label2 = new Label();
             label3 = new Label();
             cdColor = new ColorDialog();
@@ -65,7 +64,7 @@
             // 
             // nudSimultaneousDownloads
             // 
-            nudSimultaneousDownloads.Location = new Point(326, 7);
+            nudSimultaneousDownloads.Location = new Point(349, 7);
             nudSimultaneousDownloads.Maximum = new decimal(new int[] { 25, 0, 0, 0 });
             nudSimultaneousDownloads.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             nudSimultaneousDownloads.Name = "nudSimultaneousDownloads";
@@ -73,17 +72,6 @@
             nudSimultaneousDownloads.TabIndex = 1;
             tp.SetToolTip(nudSimultaneousDownloads, "Simultaneous gallery dl instances that will be open ");
             nudSimultaneousDownloads.Value = new decimal(new int[] { 1, 0, 0, 0 });
-            // 
-            // btnSave
-            // 
-            btnSave.Location = new Point(343, 221);
-            btnSave.Name = "btnSave";
-            btnSave.Size = new Size(87, 39);
-            btnSave.TabIndex = 2;
-            btnSave.Text = "Save";
-            tp.SetToolTip(btnSave, "Saves this config");
-            btnSave.UseVisualStyleBackColor = true;
-            btnSave.Click += btnSave_Click;
             // 
             // label2
             // 
@@ -107,7 +95,7 @@
             // 
             // btnChangeBackColor
             // 
-            btnChangeBackColor.Location = new Point(326, 48);
+            btnChangeBackColor.Location = new Point(349, 48);
             btnChangeBackColor.Name = "btnChangeBackColor";
             btnChangeBackColor.Size = new Size(104, 35);
             btnChangeBackColor.TabIndex = 5;
@@ -118,7 +106,7 @@
             // 
             // pnlBackColor
             // 
-            pnlBackColor.Location = new Point(270, 47);
+            pnlBackColor.Location = new Point(293, 47);
             pnlBackColor.Name = "pnlBackColor";
             pnlBackColor.Size = new Size(50, 36);
             pnlBackColor.TabIndex = 6;
@@ -126,7 +114,7 @@
             // 
             // pnlForeColor
             // 
-            pnlForeColor.Location = new Point(270, 89);
+            pnlForeColor.Location = new Point(293, 89);
             pnlForeColor.Name = "pnlForeColor";
             pnlForeColor.Size = new Size(50, 35);
             pnlForeColor.TabIndex = 8;
@@ -134,7 +122,7 @@
             // 
             // btnChangeForeColor
             // 
-            btnChangeForeColor.Location = new Point(326, 89);
+            btnChangeForeColor.Location = new Point(349, 89);
             btnChangeForeColor.Name = "btnChangeForeColor";
             btnChangeForeColor.Size = new Size(104, 35);
             btnChangeForeColor.TabIndex = 7;
@@ -145,7 +133,7 @@
             // 
             // btnUpdateGalleryDl
             // 
-            btnUpdateGalleryDl.Location = new Point(168, 221);
+            btnUpdateGalleryDl.Location = new Point(284, 221);
             btnUpdateGalleryDl.Name = "btnUpdateGalleryDl";
             btnUpdateGalleryDl.Size = new Size(169, 39);
             btnUpdateGalleryDl.TabIndex = 9;
@@ -156,7 +144,7 @@
             // 
             // btnFontChange
             // 
-            btnFontChange.Location = new Point(326, 130);
+            btnFontChange.Location = new Point(349, 130);
             btnFontChange.Name = "btnFontChange";
             btnFontChange.Size = new Size(104, 35);
             btnFontChange.TabIndex = 11;
@@ -177,7 +165,7 @@
             // 
             // lblFontPreview
             // 
-            lblFontPreview.Location = new Point(221, 133);
+            lblFontPreview.Location = new Point(244, 133);
             lblFontPreview.Name = "lblFontPreview";
             lblFontPreview.Size = new Size(99, 32);
             lblFontPreview.TabIndex = 12;
@@ -187,7 +175,7 @@
             // 
             // btninstallGDl
             // 
-            btninstallGDl.Location = new Point(14, 221);
+            btninstallGDl.Location = new Point(130, 221);
             btninstallGDl.Name = "btninstallGDl";
             btninstallGDl.Size = new Size(148, 39);
             btninstallGDl.TabIndex = 13;
@@ -198,7 +186,7 @@
             // 
             // btnCreateConfig
             // 
-            btnCreateConfig.Location = new Point(253, 176);
+            btnCreateConfig.Location = new Point(276, 176);
             btnCreateConfig.Name = "btnCreateConfig";
             btnCreateConfig.Size = new Size(177, 39);
             btnCreateConfig.TabIndex = 14;
@@ -233,7 +221,7 @@
             // 
             AutoScaleDimensions = new SizeF(14F, 28F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(437, 272);
+            ClientSize = new Size(455, 264);
             Controls.Add(btnNotifications);
             Controls.Add(label5);
             Controls.Add(btnCreateConfig);
@@ -248,7 +236,6 @@
             Controls.Add(btnChangeBackColor);
             Controls.Add(label3);
             Controls.Add(label2);
-            Controls.Add(btnSave);
             Controls.Add(nudSimultaneousDownloads);
             Controls.Add(label1);
             Font = new Font("Daily Vibes", 13.8F);
@@ -267,7 +254,6 @@
 
         private Label label1;
         private NumericUpDown nudSimultaneousDownloads;
-        private Button btnSave;
         private Label label2;
         private Label label3;
         private ColorDialog cdColor;
